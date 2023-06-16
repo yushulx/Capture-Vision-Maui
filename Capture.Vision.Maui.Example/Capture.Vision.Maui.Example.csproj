@@ -53,7 +53,17 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="2.88.3" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <ProjectReference Include="..\Capture.Vision.Maui\Capture.Vision.Maui.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiXaml Update="CameraPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	</ItemGroup>
 
 </Project>

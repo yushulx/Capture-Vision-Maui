@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:skia="clr-namespace:SkiaSharp.Views.Maui.Controls;assembly=SkiaSharp.Views.Maui.Controls"
+             xmlns:cv="clr-namespace:Capture.Vision.Maui;assembly=Capture.Vision.Maui"
+             x:Class="Capture.Vision.Maui.Example.CameraPage"
+             Title="CameraPage">
+    <ScrollView>
+        <Grid>
+            <cv:CameraView x:Name="cameraView" HorizontalOptions="FillAndExpand"
+			VerticalOptions="FillAndExpand" EnableBarcode="True" 
+                                ResultReady="cameraView_ResultReady"
+                               />
+            <skia:SKCanvasView x:Name="canvasView" 
+                           Margin="0"
+                           HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand"
+                           PaintSurface="OnCanvasViewPaintSurface" />
+        </Grid>
+    </ScrollView>
+</ContentPage>

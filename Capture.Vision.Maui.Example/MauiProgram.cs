@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using SkiaSharp.Views.Maui.Controls.Hosting;
 
 namespace Capture.Vision.Maui.Example
 {
@@ -7,7 +8,7 @@ namespace Capture.Vision.Maui.Example
         public static MauiApp CreateMauiApp()
         {
             var builder = MauiApp.CreateBuilder();
-            builder
+            builder.UseSkiaSharp().UseNativeCameraView()
                 .UseMauiApp<App>()
                 .ConfigureFonts(fonts =>
                 {
