@@ -80,7 +80,11 @@ public partial class CameraPage : ContentPage
         }
         imageWidth = e.PreviewWidth;
         imageHeight = e.PreviewHeight;
-        canvasView.InvalidateSurface();
+            
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            canvasView.InvalidateSurface();
+        });
     }
 
     public static SKPoint rotateCW90(SKPoint point, int width)

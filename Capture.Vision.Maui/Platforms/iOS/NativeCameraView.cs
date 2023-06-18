@@ -29,7 +29,8 @@ namespace Capture.Vision.Maui.Platforms.iOS
         public nint height;
         private nint bpr;
         private BarcodeQRCodeReader.Result[] results;
-        public Action update;
+        private AVCaptureDevice captureDevice;
+        private AVCaptureInput captureInput = null;
 
         public NativeCameraView(CameraView cameraView)
         {
@@ -74,7 +75,6 @@ namespace Capture.Vision.Maui.Platforms.iOS
                 cameraView.NotifyResultReady(results, (int)width, (int)height);
             }
 
-            DispatchQueue.MainQueue.DispatchAsync(update);
             ready = true;
         }
 
@@ -138,6 +138,9 @@ namespace Capture.Vision.Maui.Platforms.iOS
                                 1920 => AVCaptureSession.Preset1920x1080,
                                 _ => AVCaptureSession.PresetPhoto
                             };
+                            captureDevice = camDevices.First(d => d.UniqueID == cameraView.Camera.DeviceId);
+                            captureInput = new AVCaptureDeviceInput(captureDevice, out var err);
+                            captureSession.AddInput(captureInput);
                             captureSession.AddOutput(videoDataOutput);
                             captureSession.StartRunning();
                             started = true;
