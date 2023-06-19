@@ -12,6 +12,16 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
+		<Description>The plugin aims to help developers build .NET MAUI apps with Dynamsoft Vision SDKs.</Description>
+		<PackageProjectUrl>https://github.com/yushulx/Capture-Vision-Maui</PackageProjectUrl>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/yushulx/Capture-Vision-Maui</RepositoryUrl>
+		<PackageTags>barcode;qrcode;Aztec;QR;Datamatrix;PDF417;Code39;Code93;Code128;Codabar;Interleaved;EAN-8;EAN-13;UPC-A;UPC-E;GS1Databar;PatchCode;Maxicode;COMPOSITE;PostalCode</PackageTags>
+		<PackageReleaseNotes>
+			- Supported 1D and 2D barcode scanning.
+		</PackageReleaseNotes>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 	</PropertyGroup>
 	
 	<ItemGroup>
