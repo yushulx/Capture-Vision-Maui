@@ -66,7 +66,7 @@ namespace Capture.Vision.Maui.Platforms.iOS
             {
                 byte[] bytearray = new byte[buffer.Length];
                 System.Runtime.InteropServices.Marshal.Copy(buffer.Bytes, bytearray, 0, Convert.ToInt32(buffer.Length));
-                cameraView.NotifyGrayscaleFrameReady(bytearray, (int)width, (int)height, (int)bpr, FrameReadyEventArgs.PixelFormat.RGBA8888);
+                cameraView.NotifyFrameReady(bytearray, (int)width, (int)height, (int)bpr, FrameReadyEventArgs.PixelFormat.RGBA8888);
                 if (cameraView.EnableBarcode)
                 {
                     results = barcodeReader.DecodeBuffer(bytearray,

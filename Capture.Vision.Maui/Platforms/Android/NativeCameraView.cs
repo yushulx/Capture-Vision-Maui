@@ -367,7 +367,7 @@ namespace Capture.Vision.Maui.Platforms.Android
                     int nPixelStride = planes[0].PixelStride;
                     image.Close();
 
-                    cameraView.NotifyGrayscaleFrameReady(bytes, width, height, nPixelStride * nRowStride, FrameReadyEventArgs.PixelFormat.GRAYSCALE);
+                    cameraView.NotifyFrameReady(bytes, width, height, nPixelStride * nRowStride, FrameReadyEventArgs.PixelFormat.GRAYSCALE);
                     if (cameraView.EnableBarcode)
                     {
                         Result[] results = barcodeReader.DecodeBuffer(bytes, width, height, nPixelStride * nRowStride, BarcodeQRCodeReader.ImagePixelFormat.IPF_GRAYSCALED);

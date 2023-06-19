@@ -53,7 +53,7 @@ namespace Capture.Vision.Maui.Platforms.Windows
                 {
                     byte[] buffer = new byte[bitmap.PixelWidth * bitmap.PixelHeight];
                     bitmap.CopyToBuffer(buffer.AsBuffer());
-                    cameraView.NotifyGrayscaleFrameReady(buffer, bitmap.PixelWidth, bitmap.PixelHeight, bitmap.PixelWidth, FrameReadyEventArgs.PixelFormat.GRAYSCALE);
+                    cameraView.NotifyFrameReady(buffer, bitmap.PixelWidth, bitmap.PixelHeight, bitmap.PixelWidth, FrameReadyEventArgs.PixelFormat.GRAYSCALE);
                     if (cameraView.EnableBarcode)
                     {
                         Result[] results = barcodeReader.DecodeBuffer(buffer, bitmap.PixelWidth, bitmap.PixelHeight, bitmap.PixelWidth, BarcodeQRCodeReader.ImagePixelFormat.IPF_GRAYSCALED);

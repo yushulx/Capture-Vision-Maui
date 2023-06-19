@@ -85,7 +85,7 @@ namespace Capture.Vision.Maui
             }
         }
 
-        public void NotifyGrayscaleFrameReady(byte[] buffer, int width, int height, int stride, FrameReadyEventArgs.PixelFormat format)
+        public void NotifyFrameReady(byte[] buffer, int width, int height, int stride, FrameReadyEventArgs.PixelFormat format)
         {
             if (FrameReady != null)
             {
