@@ -1,7 +1,6 @@
 using Dynamsoft;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
-using System;
 using static Dynamsoft.BarcodeQRCodeReader;
 
 namespace Capture.Vision.Maui.Example;
@@ -65,6 +64,11 @@ public partial class CameraPage : ContentPage
         cameraView.ShowCameraView = false;
     }
 
+    private void cameraView_FrameReady(object sender, FrameReadyEventArgs e)
+    {
+        // process image
+    }
+
     private void cameraView_ResultReady(object sender, ResultReadyEventArgs e)
     {
         if (e.Result != null)
@@ -80,7 +84,7 @@ public partial class CameraPage : ContentPage
         }
         imageWidth = e.PreviewWidth;
         imageHeight = e.PreviewHeight;
-            
+
         MainThread.BeginInvokeOnMainThread(() =>
         {
             canvasView.InvalidateSurface();

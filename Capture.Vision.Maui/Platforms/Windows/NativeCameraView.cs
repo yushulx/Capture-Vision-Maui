@@ -53,8 +53,13 @@ namespace Capture.Vision.Maui.Platforms.Windows
                 {
                     byte[] buffer = new byte[bitmap.PixelWidth * bitmap.PixelHeight];
                     bitmap.CopyToBuffer(buffer.AsBuffer());
-                    Result[] results = barcodeReader.DecodeBuffer(buffer, bitmap.PixelWidth, bitmap.PixelHeight, bitmap.PixelWidth, BarcodeQRCodeReader.ImagePixelFormat.IPF_GRAYSCALED);
-                    cameraView.NotifyResultReady(results, bitmap.PixelWidth, bitmap.PixelHeight);
+                    cameraView.NotifyGrayscaleFrameReady(buffer, bitmap.PixelWidth, bitmap.PixelHeight, bitmap.PixelWidth, FrameReadyEventArgs.PixelFormat.GRAYSCALE);
+                    if (cameraView.EnableBarcode)
+                    {
+                        Result[] results = barcodeReader.DecodeBuffer(buffer, bitmap.PixelWidth, bitmap.PixelHeight, bitmap.PixelWidth, BarcodeQRCodeReader.ImagePixelFormat.IPF_GRAYSCALED);
+                        cameraView.NotifyResultReady(results, bitmap.PixelWidth, bitmap.PixelHeight);
+                    }
+                    
                     bitmap.Dispose();
                 }
             }
@@ -198,17 +203,14 @@ namespace Capture.Vision.Maui.Platforms.Windows
 
         private void OnFrameAvailable(MediaFrameReader sender, MediaFrameArrivedEventArgs args)
         {
-            if (cameraView.EnableBarcode)
-            {
-                var frame = sender.TryAcquireLatestFrame();
-                if (frame == null) return;
+            var frame = sender.TryAcquireLatestFrame();
+            if (frame == null) return;
 
-                SoftwareBitmap bitmap = frame.VideoMediaFrame.SoftwareBitmap;
-                if (_bitmapQueue.Count == 2) ClearQueue();
-                SoftwareBitmap grayscale = SoftwareBitmap.Convert(bitmap, BitmapPixelFormat.Gray8, BitmapAlphaMode.Ignore);
-                _bitmapQueue.Enqueue(grayscale);
-                bitmap.Dispose();
-            }
+            SoftwareBitmap bitmap = frame.VideoMediaFrame.SoftwareBitmap;
+            if (_bitmapQueue.Count == 2) ClearQueue();
+            SoftwareBitmap grayscale = SoftwareBitmap.Convert(bitmap, BitmapPixelFormat.Gray8, BitmapAlphaMode.Ignore);
+            _bitmapQueue.Enqueue(grayscale);
+            bitmap.Dispose();
         }
 
         internal async Task<Status> StopCameraAsync()

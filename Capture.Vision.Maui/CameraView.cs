@@ -18,6 +18,32 @@ namespace Capture.Vision.Maui
 
     }
 
+    public class FrameReadyEventArgs : EventArgs
+    { 
+        public enum PixelFormat
+        {
+            GRAYSCALE,
+            RGB888,
+            BGR888,
+            RGBA8888,
+            BGRA8888,
+        }
+        public FrameReadyEventArgs(byte[] buffer, int width, int height, int stride, PixelFormat pixelFormat)
+        {
+            Buffer = buffer;
+            Width = width;
+            Height = height;
+            Stride = stride;
+            Format = pixelFormat;
+        }
+
+        public byte[] Buffer { get; private set; }
+        public int Width { get; private set; }
+        public int Height { get; private set; }
+        public int Stride { get; private set; }
+        public PixelFormat Format { get; private set; }
+    }
+
     public class CameraView : View
     {
         public static readonly BindableProperty CamerasProperty = BindableProperty.Create(nameof(Cameras), typeof(ObservableCollection<CameraInfo>), typeof(CameraView), new ObservableCollection<CameraInfo>());
@@ -25,6 +51,7 @@ namespace Capture.Vision.Maui
         public static readonly BindableProperty EnableBarcodeProperty = BindableProperty.Create(nameof(EnableBarcode), typeof(bool), typeof(CameraView), false);
         public static readonly BindableProperty ShowCameraViewProperty = BindableProperty.Create(nameof(ShowCameraView), typeof(bool), typeof(CameraView), false, propertyChanged: ShowCameraViewChanged);
         public event EventHandler<ResultReadyEventArgs> ResultReady;
+        public event EventHandler<FrameReadyEventArgs> FrameReady;
 
         public ObservableCollection<CameraInfo> Cameras
         {
@@ -55,6 +82,14 @@ namespace Capture.Vision.Maui
             if (ResultReady != null)
             {
                 ResultReady(this, new ResultReadyEventArgs(result, previewWidth, previewHeight));
+            }
+        }
+
+        public void NotifyGrayscaleFrameReady(byte[] buffer, int width, int height, int stride, FrameReadyEventArgs.PixelFormat format)
+        {
+            if (FrameReady != null)
+            {
+                FrameReady(this, new FrameReadyEventArgs(buffer, width, height, stride, format));
             }
         }
 

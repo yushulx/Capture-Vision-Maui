@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Capture.Vision.Maui
+﻿namespace Capture.Vision.Maui
 {
     public static class AppBuilderExtensions
     {

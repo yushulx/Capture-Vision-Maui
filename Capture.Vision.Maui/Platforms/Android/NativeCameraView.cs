@@ -349,8 +349,6 @@ namespace Capture.Vision.Maui.Platforms.Android
 
             public void OnImageAvailable(ImageReader reader)
             {
-                if (!cameraView.EnableBarcode) return;
-
                 try
                 {
                     var image = reader?.AcquireLatestImage();
@@ -369,8 +367,13 @@ namespace Capture.Vision.Maui.Platforms.Android
                     int nPixelStride = planes[0].PixelStride;
                     image.Close();
 
-                    Result[] results = barcodeReader.DecodeBuffer(bytes, width, height, nPixelStride * nRowStride, BarcodeQRCodeReader.ImagePixelFormat.IPF_GRAYSCALED);
-                    cameraView.NotifyResultReady(results, width, height);
+                    cameraView.NotifyGrayscaleFrameReady(bytes, width, height, nPixelStride * nRowStride, FrameReadyEventArgs.PixelFormat.GRAYSCALE);
+                    if (cameraView.EnableBarcode)
+                    {
+                        Result[] results = barcodeReader.DecodeBuffer(bytes, width, height, nPixelStride * nRowStride, BarcodeQRCodeReader.ImagePixelFormat.IPF_GRAYSCALED);
+                        cameraView.NotifyResultReady(results, width, height);
+                    }
+                        
                 }
                 catch (Exception ex)
                 {
