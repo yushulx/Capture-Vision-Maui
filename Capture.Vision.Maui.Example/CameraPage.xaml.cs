@@ -1,6 +1,8 @@
 using Dynamsoft;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
+using System.Runtime.InteropServices;
+using static Capture.Vision.Maui.FrameReadyEventArgs;
 using static Dynamsoft.BarcodeQRCodeReader;
 
 namespace Capture.Vision.Maui.Example;
@@ -52,6 +54,7 @@ public partial class CameraPage : ContentPage
     BarcodeQrData[] data = null;
     private int imageWidth;
     private int imageHeight;
+    bool saveImage = true;
 
     public CameraPage()
     {
@@ -67,6 +70,32 @@ public partial class CameraPage : ContentPage
     private void cameraView_FrameReady(object sender, FrameReadyEventArgs e)
     {
         // process image
+        if (saveImage)
+        {
+            saveImage = false;
+            byte[] buffer = (byte[])e.Buffer;
+            int width = e.Width;
+            int height = e.Height;
+            int stride = e.Stride;
+            PixelFormat format = e.Format;
+
+            SKImageInfo info = new SKImageInfo(width, height, SKColorType.Gray8, SKAlphaType.Premul);
+
+            // Create the SKBitmap
+            SKBitmap bitmap = new SKBitmap(info);
+            bitmap.SetPixels((Marshal.UnsafeAddrOfPinnedArrayElement(buffer, 0)));
+
+            // Save the data to a file
+            using SKImage image = SKImage.FromBitmap(bitmap);
+            using SKData data = image.Encode(SKEncodedImageFormat.Jpeg, 100);
+            var appDataDirectory = FileSystem.AppDataDirectory;
+
+            // Combine the app's data directory path with your file name
+            var filePath = Path.Combine(appDataDirectory, "yourfile.jpg");
+
+            using FileStream stream = File.OpenWrite(filePath);
+            data.SaveTo(stream);
+        }
     }
 
     private void cameraView_ResultReady(object sender, ResultReadyEventArgs e)
