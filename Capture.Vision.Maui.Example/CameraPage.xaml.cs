@@ -55,11 +55,21 @@ public partial class CameraPage : ContentPage
     private int imageWidth;
     private int imageHeight;
     bool saveImage = true;
-
+    private static object _lockObject = new object();
+    DisplayOrientation orientation;
+    DisplayRotation rotation;
+    DisplayInfo mainDisplayInfo;
+    double density, scale, widthScale, heightScale, scaledWidth, scaledHeight, width, height;
+    bool isFirstTime = true;
     public CameraPage()
     {
         InitializeComponent();
         this.Disappearing += OnDisappearing;
+
+        mainDisplayInfo = DeviceDisplay.MainDisplayInfo;
+        orientation = mainDisplayInfo.Orientation;
+        rotation = mainDisplayInfo.Rotation;
+        density = mainDisplayInfo.Density;
     }
 
     private void OnDisappearing(object sender, EventArgs e)
@@ -100,19 +110,50 @@ public partial class CameraPage : ContentPage
 
     private void cameraView_ResultReady(object sender, ResultReadyEventArgs e)
     {
-        if (e.Result != null)
+        lock (_lockObject)
         {
-            Result[] results = (Result[])e.Result;
-            foreach (Result result in results)
+            if (e.Result != null)
             {
-                System.Diagnostics.Debug.WriteLine(result.Text);
+                imageWidth = e.PreviewWidth;
+                imageHeight = e.PreviewHeight;
+                if (orientation == DisplayOrientation.Portrait)
+                {
+                    widthScale = imageHeight / width;
+                    heightScale = imageWidth / height;
+                    scale = widthScale < heightScale ? widthScale : heightScale;
+                    scaledWidth = imageHeight / scale;
+                    scaledHeight = imageWidth / scale;
+                }
+                else
+                {
+                    widthScale = imageWidth / width;
+                    heightScale = imageHeight / height;
+                    scale = widthScale < heightScale ? widthScale : heightScale;
+                    scaledWidth = imageWidth / scale;
+                    scaledHeight = imageHeight / scale;
+                }
+
+                data = BarcodeQrData.Convert((Result[])e.Result);
+                foreach (BarcodeQrData barcodeQrData in data)
+                {
+                    for (int i = 0; i < 4; i++)
+                    {
+                        if (orientation == DisplayOrientation.Portrait)
+                        {
+                            barcodeQrData.points[i] = rotateCW90(barcodeQrData.points[i], imageHeight);
+                        }
+
+                        barcodeQrData.points[i].X = (float)(barcodeQrData.points[i].X / scale);
+                        barcodeQrData.points[i].Y = (float)(barcodeQrData.points[i].Y / scale);
+                    }
+                }
             }
-            data = BarcodeQrData.Convert((Result[])e.Result);
-
-
+            else
+            {
+                data = null;
+            }
         }
-        imageWidth = e.PreviewWidth;
-        imageHeight = e.PreviewHeight;
+            
 
         MainThread.BeginInvokeOnMainThread(() =>
         {
@@ -130,34 +171,14 @@ public partial class CameraPage : ContentPage
 
     void OnCanvasViewPaintSurface(object sender, SKPaintSurfaceEventArgs args)
     {
-        double width = canvasView.Width;
-        double height = canvasView.Height;
-
-        var mainDisplayInfo = DeviceDisplay.MainDisplayInfo;
-        var orientation = mainDisplayInfo.Orientation;
-        var rotation = mainDisplayInfo.Rotation;
-        var density = mainDisplayInfo.Density;
-
-        width *= density;
-        height *= density;
-
-        double scale, widthScale, heightScale, scaledWidth, scaledHeight;
-
-        if (orientation == DisplayOrientation.Portrait)
+        if (isFirstTime)
         {
-            widthScale = imageHeight / width;
-            heightScale = imageWidth / height;
-            scale = widthScale < heightScale ? widthScale : heightScale;
-            scaledWidth = imageHeight / scale;
-            scaledHeight = imageWidth / scale;
-        }
-        else
-        {
-            widthScale = imageWidth / width;
-            heightScale = imageHeight / height;
-            scale = widthScale < heightScale ? widthScale : heightScale;
-            scaledWidth = imageWidth / scale;
-            scaledHeight = imageHeight / scale;
+            isFirstTime = false;
+            width = canvasView.Width;
+            height = canvasView.Height;
+
+            width *= density;
+            height *= density;
         }
 
         SKImageInfo info = args.Info;
@@ -181,38 +202,19 @@ public partial class CameraPage : ContentPage
             StrokeWidth = 4,
         };
 
-        if (data != null)
+        lock (_lockObject)
         {
-            foreach (BarcodeQrData barcodeQrData in data)
+            if (data != null)
             {
-                //ResultLabel.Text += barcodeQrData.text + "\n";
-
-                for (int i = 0; i < 4; i++)
+                foreach (BarcodeQrData barcodeQrData in data)
                 {
-                    if (orientation == DisplayOrientation.Portrait)
-                    {
-                        barcodeQrData.points[i] = rotateCW90(barcodeQrData.points[i], imageHeight);
-                    }
-
-                    if (widthScale < heightScale)
-                    {
-                        barcodeQrData.points[i].X = (float)(barcodeQrData.points[i].X / scale);
-                        barcodeQrData.points[i].Y = (float)(barcodeQrData.points[i].Y / scale - (scaledHeight - height) / 2);
-                    }
-                    else
-                    {
-                        barcodeQrData.points[i].X = (float)(barcodeQrData.points[i].X / scale - (scaledWidth - width) / 2);
-                        barcodeQrData.points[i].Y = (float)(barcodeQrData.points[i].Y / scale);
-                    }
+                    canvas.DrawText(barcodeQrData.text, barcodeQrData.points[0], textPaint);
+                    canvas.DrawLine(barcodeQrData.points[0], barcodeQrData.points[1], skPaint);
+                    canvas.DrawLine(barcodeQrData.points[1], barcodeQrData.points[2], skPaint);
+                    canvas.DrawLine(barcodeQrData.points[2], barcodeQrData.points[3], skPaint);
+                    canvas.DrawLine(barcodeQrData.points[3], barcodeQrData.points[0], skPaint);
                 }
-
-                canvas.DrawText(barcodeQrData.text, barcodeQrData.points[0], textPaint);
-                canvas.DrawLine(barcodeQrData.points[0], barcodeQrData.points[1], skPaint);
-                canvas.DrawLine(barcodeQrData.points[1], barcodeQrData.points[2], skPaint);
-                canvas.DrawLine(barcodeQrData.points[2], barcodeQrData.points[3], skPaint);
-                canvas.DrawLine(barcodeQrData.points[3], barcodeQrData.points[0], skPaint);
             }
         }
-
     }
 }
