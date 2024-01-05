@@ -1,7 +1,7 @@
 # .NET MAUI Camera View with Dynamsoft Vision SDKs
 The project aims to help developers build .NET MAUI apps that feature a custom camera view, utilizing [Dynamsoft](https://www.dynamsoft.com/) Vision SDKs for barcode, MRZ, and document detection.
 
-![.NET MAUI Windows QR code scanner](https://www.dynamsoft.com/codepool/img/2023/06/dotnet-maui-windows-qr-code-scanner.png)
+![.NET MAUI Windows QR code scanner](https://camo.githubusercontent.com/aa201f46370bc5952a7b9fcf1689e07cd5090a2cb8aef49fb2806452d2f0b2e9/68747470733a2f2f7777772e64796e616d736f66742e636f6d2f636f6465706f6f6c2f696d672f323032332f30362f646f746e65742d6d6175692d77696e646f77732d71722d636f64652d7363616e6e65722e706e67)
 
 ## Supported Platforms
 - Android
