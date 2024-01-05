@@ -58,6 +58,10 @@ namespace Capture.Vision.Maui.Platforms.iOS
             InitCameras();
 
             barcodeReader = BarcodeQRCodeReader.Create();
+            if (cameraView.BarcodeParameters != null)
+            {
+                barcodeReader.SetParameters(cameraView.BarcodeParameters);
+            }
         }
 
         private void ReadTask()

@@ -52,6 +52,7 @@ namespace Capture.Vision.Maui
         public static readonly BindableProperty ShowCameraViewProperty = BindableProperty.Create(nameof(ShowCameraView), typeof(bool), typeof(CameraView), false, propertyChanged: ShowCameraViewChanged);
         public event EventHandler<ResultReadyEventArgs> ResultReady;
         public event EventHandler<FrameReadyEventArgs> FrameReady;
+        public string BarcodeParameters { get; set; } = string.Empty;
 
         public ObservableCollection<CameraInfo> Cameras
         {

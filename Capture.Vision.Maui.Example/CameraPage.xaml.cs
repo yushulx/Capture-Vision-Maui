@@ -70,6 +70,7 @@ public partial class CameraPage : ContentPage
         orientation = mainDisplayInfo.Orientation;
         rotation = mainDisplayInfo.Rotation;
         density = mainDisplayInfo.Density;
+        cameraView.BarcodeParameters = "{\"Version\":\"3.0\", \"ImageParameter\":{\"Name\":\"IP1\", \"BarcodeFormatIds\":[\"BF_QR_CODE\", \"BF_ONED\"], \"ExpectedBarcodesCount\":20}}";
     }
 
     private void OnDisappearing(object sender, EventArgs e)

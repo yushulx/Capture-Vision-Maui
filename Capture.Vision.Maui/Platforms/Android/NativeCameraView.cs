@@ -59,6 +59,10 @@ namespace Capture.Vision.Maui.Platforms.Android
             InitCameras();
 
             barcodeReader = BarcodeQRCodeReader.Create();
+            if (cameraView.BarcodeParameters != null)
+            {
+                barcodeReader.SetParameters(cameraView.BarcodeParameters);
+            }
         }
 
         private void InitCameras()
