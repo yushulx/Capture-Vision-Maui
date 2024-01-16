@@ -1,57 +1,33 @@
-using Dynamsoft;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
 using System.Runtime.InteropServices;
 using static Capture.Vision.Maui.FrameReadyEventArgs;
-using static Dynamsoft.BarcodeQRCodeReader;
 
 namespace Capture.Vision.Maui.Example;
 
 public class BarcodeQrData
 {
-    public string text;
-    public string format;
-    public SKPoint[] points;
+    public BarcodeResult Reference { get; set; }
+    public SKPoint[] Points;
+}
 
-    public static BarcodeQrData[] Convert(BarcodeQRCodeReader.Result[] results)
-    {
-        BarcodeQrData[] output = null;
-        if (results != null && results.Length > 0)
-        {
-            output = new BarcodeQrData[results.Length];
-            for (int index = 0; index < results.Length; ++index)
-            {
-                BarcodeQRCodeReader.Result result = results[index];
-                BarcodeQrData data = new BarcodeQrData
-                {
-                    text = result.Text,
-                    format = result.Format1
-                };
-                int[] coordinates = result.Points;
-                if (coordinates != null && coordinates.Length == 8)
-                {
-                    data.points = new SKPoint[4];
+public class DocumentData
+{
+    public DocumentResult Reference { get; set; }
+    public SKPoint[] Points;
+}
 
-                    for (int i = 0; i < 4; ++i)
-                    {
-                        SKPoint p = new SKPoint();
-                        p.X = coordinates[i * 2];
-                        p.Y = coordinates[i * 2 + 1];
-                        data.points[i] = p;
-                    }
-                }
-
-
-                output[index] = data;
-            }
-        }
-        return output;
-    }
+public class MrzData
+{
+    public MrzResult Reference { get; set; }
+    public SKPoint[] Points;
 }
 
 public partial class CameraPage : ContentPage
 {
-    BarcodeQrData[] data = null;
+    BarcodeQrData[] barcodeData = null;
+    DocumentData documentData = null;
+    MrzResult mrzData = null;
     private int imageWidth;
     private int imageHeight;
     bool saveImage = true;
@@ -70,7 +46,7 @@ public partial class CameraPage : ContentPage
         orientation = mainDisplayInfo.Orientation;
         rotation = mainDisplayInfo.Rotation;
         density = mainDisplayInfo.Density;
-        cameraView.BarcodeParameters = "{\"Version\":\"3.0\", \"ImageParameter\":{\"Name\":\"IP1\", \"BarcodeFormatIds\":[\"BF_QR_CODE\", \"BF_ONED\"], \"ExpectedBarcodesCount\":20}}";
+        //cameraView.BarcodeParameters = "{\"Version\":\"3.0\", \"ImageParameter\":{\"Name\":\"IP1\", \"BarcodeFormatIds\":[\"BF_QR_CODE\", \"BF_ONED\"], \"ExpectedBarcodesCount\":20}}";
     }
 
     private void OnDisappearing(object sender, EventArgs e)
@@ -134,24 +110,96 @@ public partial class CameraPage : ContentPage
                     scaledHeight = imageHeight / scale;
                 }
 
-                data = BarcodeQrData.Convert((Result[])e.Result);
-                foreach (BarcodeQrData barcodeQrData in data)
+                if (e.Result is BarcodeResult[])
                 {
-                    for (int i = 0; i < 4; i++)
-                    {
-                        if (orientation == DisplayOrientation.Portrait)
-                        {
-                            barcodeQrData.points[i] = rotateCW90(barcodeQrData.points[i], imageHeight);
-                        }
+                    barcodeData = null;
+                    BarcodeResult[] barcodeResults = (BarcodeResult[])e.Result;
 
-                        barcodeQrData.points[i].X = (float)(barcodeQrData.points[i].X / scale);
-                        barcodeQrData.points[i].Y = (float)(barcodeQrData.points[i].Y / scale);
+                    if (barcodeResults != null && barcodeResults.Length > 0)
+                    {
+                        barcodeData = new BarcodeQrData[barcodeResults.Length];
+
+                        for (int index = 0; index < barcodeResults.Length; ++index)
+                        {
+                            barcodeData[index] = new BarcodeQrData()
+                            {
+                                Reference = barcodeResults[index]
+                            };
+                            int[] coordinates = barcodeResults[index].Points;
+                            if (coordinates != null && coordinates.Length == 8)
+                            {
+                                barcodeData[index].Points = new SKPoint[4];
+
+                                for (int i = 0; i < 4; ++i)
+                                {
+                                    SKPoint p = new SKPoint();
+                                    p.X = coordinates[i * 2];
+                                    p.Y = coordinates[i * 2 + 1];
+                                    barcodeData[index].Points[i] = p;
+
+                                    if (orientation == DisplayOrientation.Portrait)
+                                    {
+                                        barcodeData[index].Points[i] = rotateCW90(barcodeData[index].Points[i], imageHeight);
+                                    }
+
+                                    barcodeData[index].Points[i].X = (float)(barcodeData[index].Points[i].X / scale);
+                                    barcodeData[index].Points[i].Y = (float)(barcodeData[index].Points[i].Y / scale);
+                                }
+                            }
+                        }
                     }
                 }
+                else if (e.Result is DocumentResult)
+                {
+                    documentData = null;
+                    DocumentResult documentResult = (DocumentResult)e.Result;
+
+                    if (documentResult != null)
+                    {
+                        documentData = new DocumentData()
+                        {
+                            Reference = (DocumentResult)e.Result
+                        };
+                        int[] coordinates = documentData.Reference.Points;
+                        if (coordinates != null && coordinates.Length == 8)
+                        {
+                            documentData.Points = new SKPoint[4];
+
+                            for (int i = 0; i < 4; ++i)
+                            {
+                                SKPoint p = new SKPoint();
+                                p.X = coordinates[i * 2];
+                                p.Y = coordinates[i * 2 + 1];
+                                documentData.Points[i] = p;
+
+                                if (orientation == DisplayOrientation.Portrait)
+                                {
+                                    documentData.Points[i] = rotateCW90(documentData.Points[i], imageHeight);
+                                }
+
+                                documentData.Points[i].X = (float)(documentData.Points[i].X / scale);
+                                documentData.Points[i].Y = (float)(documentData.Points[i].Y / scale);
+                            }
+                        }
+                    }
+                }
+                else if (e.Result is MrzResult)
+                {
+                    mrzData = null;
+                    MrzResult mrzResult = (MrzResult)e.Result;
+
+                    if (mrzResult != null)
+                    {
+
+                    }
+                }
+                
             }
             else
             {
-                data = null;
+                barcodeData = null;
+                documentData = null;
+                mrzData = null;
             }
         }
             
@@ -188,33 +236,75 @@ public partial class CameraPage : ContentPage
 
         canvas.Clear();
 
-        SKPaint skPaint = new SKPaint
-        {
-            Style = SKPaintStyle.Stroke,
-            Color = SKColors.Blue,
-            StrokeWidth = 10,
-        };
-
-        SKPaint textPaint = new SKPaint
-        {
-            Style = SKPaintStyle.Stroke,
-            Color = SKColors.Red,
-            TextSize = (float)(18 * density),
-            StrokeWidth = 4,
-        };
-
         lock (_lockObject)
         {
-            if (data != null)
+            if (barcodeData != null)
             {
-                foreach (BarcodeQrData barcodeQrData in data)
+                SKPaint skPaint = new SKPaint
                 {
-                    canvas.DrawText(barcodeQrData.text, barcodeQrData.points[0], textPaint);
-                    canvas.DrawLine(barcodeQrData.points[0], barcodeQrData.points[1], skPaint);
-                    canvas.DrawLine(barcodeQrData.points[1], barcodeQrData.points[2], skPaint);
-                    canvas.DrawLine(barcodeQrData.points[2], barcodeQrData.points[3], skPaint);
-                    canvas.DrawLine(barcodeQrData.points[3], barcodeQrData.points[0], skPaint);
+                    Style = SKPaintStyle.Stroke,
+                    Color = SKColors.Blue,
+                    StrokeWidth = 10,
+                };
+
+                SKPaint textPaint = new SKPaint
+                {
+                    Style = SKPaintStyle.Stroke,
+                    Color = SKColors.Blue,
+                    TextSize = (float)(18 * density),
+                    StrokeWidth = 4,
+                };
+
+                foreach (BarcodeQrData barcodeQrData in barcodeData)
+                {
+                    canvas.DrawText(barcodeQrData.Reference.Text, barcodeQrData.Points[0], textPaint);
+                    canvas.DrawLine(barcodeQrData.Points[0], barcodeQrData.Points[1], skPaint);
+                    canvas.DrawLine(barcodeQrData.Points[1], barcodeQrData.Points[2], skPaint);
+                    canvas.DrawLine(barcodeQrData.Points[2], barcodeQrData.Points[3], skPaint);
+                    canvas.DrawLine(barcodeQrData.Points[3], barcodeQrData.Points[0], skPaint);
                 }
+            }
+
+            if (documentData != null)
+            {
+                SKPaint skPaint = new SKPaint
+                {
+                    Style = SKPaintStyle.Stroke,
+                    Color = SKColors.Red,
+                    StrokeWidth = 10,
+                };
+
+                SKPaint textPaint = new SKPaint
+                {
+                    Style = SKPaintStyle.Stroke,
+                    Color = SKColors.Red,
+                    TextSize = (float)(18 * density),
+                    StrokeWidth = 4,
+                };
+
+                canvas.DrawText("Detected Document", documentData.Points[0], textPaint);
+                canvas.DrawLine(documentData.Points[0], documentData.Points[1], skPaint);
+                canvas.DrawLine(documentData.Points[1], documentData.Points[2], skPaint);
+                canvas.DrawLine(documentData.Points[2], documentData.Points[3], skPaint);
+                canvas.DrawLine(documentData.Points[3], documentData.Points[0], skPaint);
+            }
+
+            if (mrzData != null)
+            {
+                SKPaint skPaint = new SKPaint
+                {
+                    Style = SKPaintStyle.Stroke,
+                    Color = SKColors.Yellow,
+                    StrokeWidth = 10,
+                };
+
+                SKPaint textPaint = new SKPaint
+                {
+                    Style = SKPaintStyle.Stroke,
+                    Color = SKColors.Yellow,
+                    TextSize = (float)(18 * density),
+                    StrokeWidth = 4,
+                };
             }
         }
     }

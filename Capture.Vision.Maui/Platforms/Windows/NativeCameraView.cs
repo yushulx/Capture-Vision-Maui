@@ -10,6 +10,8 @@ using System.Collections.Concurrent;
 using Dynamsoft;
 using static Capture.Vision.Maui.CameraInfo;
 using static Dynamsoft.BarcodeQRCodeReader;
+using static Dynamsoft.MrzScanner;
+using static Dynamsoft.DocumentScanner;
 
 namespace Capture.Vision.Maui.Platforms.Windows
 {
@@ -17,6 +19,8 @@ namespace Capture.Vision.Maui.Platforms.Windows
     {
         private Microsoft.UI.Xaml.FlowDirection flowDirection = Microsoft.UI.Xaml.FlowDirection.LeftToRight;
         private BarcodeQRCodeReader barcodeReader;
+        private DocumentScanner documentScanner;
+        private MrzScanner mrzScanner;
         private Thread thread;
         private static object lockObject = new object();
         private ConcurrentQueue<SoftwareBitmap> _bitmapQueue = new ConcurrentQueue<SoftwareBitmap>();
@@ -46,6 +50,12 @@ namespace Capture.Vision.Maui.Platforms.Windows
             {
                 barcodeReader.SetParameters(cameraView.BarcodeParameters);
             }
+
+            documentScanner = DocumentScanner.Create();
+
+            mrzScanner = MrzScanner.Create();
+            int ret = mrzScanner.LoadModel();
+            Console.WriteLine("LoadModel: " + ret);
         }
 
         private void ProcessFrames()
@@ -61,7 +71,52 @@ namespace Capture.Vision.Maui.Platforms.Windows
                     cameraView.NotifyFrameReady(buffer, bitmap.PixelWidth, bitmap.PixelHeight, bitmap.PixelWidth, FrameReadyEventArgs.PixelFormat.GRAYSCALE);
                     if (cameraView.EnableBarcode)
                     {
-                        Result[] results = barcodeReader.DecodeBuffer(buffer, bitmap.PixelWidth, bitmap.PixelHeight, bitmap.PixelWidth, BarcodeQRCodeReader.ImagePixelFormat.IPF_GRAYSCALED);
+                        BarcodeQRCodeReader.Result[] results = barcodeReader.DecodeBuffer(buffer, bitmap.PixelWidth, bitmap.PixelHeight, bitmap.PixelWidth, BarcodeQRCodeReader.ImagePixelFormat.IPF_GRAYSCALED);
+                        BarcodeResult[] barcodeResults = null;
+                        if (results != null && results.Length > 0)
+                        {
+                            barcodeResults = new BarcodeResult[results.Length];
+
+                            for (int i = 0; i < results.Length; i++)
+                            {
+                                barcodeResults[i] = new BarcodeResult()
+                                {
+                                    Text = results[i].Text,
+                                    Points = results[i].Points,
+                                    Format1 = results[i].Format1,
+                                    Format2  = results[i].Format2
+                                };
+                            }
+                        }
+                        cameraView.NotifyResultReady(barcodeResults, bitmap.PixelWidth, bitmap.PixelHeight);
+                    }
+
+                    if (cameraView.EnableDocumentDetect)
+                    {
+                        DocumentScanner.Result[] results = documentScanner.DetectBuffer(buffer, bitmap.PixelWidth, bitmap.PixelHeight, bitmap.PixelWidth, DocumentScanner.ImagePixelFormat.IPF_GRAYSCALED);
+                        DocumentResult documentResults = null;
+                        if (results != null && results.Length > 0)
+                        {
+                            documentResults = new DocumentResult
+                            {
+                                Confidence = results[0].Confidence,
+                                Points = results[0].Points
+                            };
+
+                            if (cameraView.EnableDocumentRectify)
+                            {
+                                NormalizedImage image = documentScanner.NormalizeBuffer(buffer, bitmap.PixelWidth, bitmap.PixelHeight, bitmap.PixelWidth, DocumentScanner.ImagePixelFormat.IPF_GRAYSCALED, documentResults.Points);
+                                documentResults.Image = image;
+                            }
+                        }
+
+                        cameraView.NotifyResultReady(documentResults, bitmap.PixelWidth, bitmap.PixelHeight);
+
+                    }
+
+                    if (cameraView.EnableMrz)
+                    {
+                        MrzScanner.Result[] results = mrzScanner.DetectBuffer(buffer, bitmap.PixelWidth, bitmap.PixelHeight, bitmap.PixelWidth, MrzScanner.ImagePixelFormat.IPF_GRAYSCALED);
                         cameraView.NotifyResultReady(results, bitmap.PixelWidth, bitmap.PixelHeight);
                     }
                     

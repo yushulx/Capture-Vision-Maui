@@ -49,6 +49,9 @@ namespace Capture.Vision.Maui
         public static readonly BindableProperty CamerasProperty = BindableProperty.Create(nameof(Cameras), typeof(ObservableCollection<CameraInfo>), typeof(CameraView), new ObservableCollection<CameraInfo>());
         public static readonly BindableProperty CameraProperty = BindableProperty.Create(nameof(Camera), typeof(CameraInfo), typeof(CameraView), null);
         public static readonly BindableProperty EnableBarcodeProperty = BindableProperty.Create(nameof(EnableBarcode), typeof(bool), typeof(CameraView), false);
+        public static readonly BindableProperty EnableDocumentDetectProperty = BindableProperty.Create(nameof(EnableDocumentDetectProperty), typeof(bool), typeof(CameraView), false);
+        public static readonly BindableProperty EnableDocumentRectifyProperty = BindableProperty.Create(nameof(EnableDocumentRectifyProperty), typeof(bool), typeof(CameraView), false);
+        public static readonly BindableProperty EnableMrzProperty = BindableProperty.Create(nameof(EnableMrzProperty), typeof(bool), typeof(CameraView), false);
         public static readonly BindableProperty ShowCameraViewProperty = BindableProperty.Create(nameof(ShowCameraView), typeof(bool), typeof(CameraView), false, propertyChanged: ShowCameraViewChanged);
         public event EventHandler<ResultReadyEventArgs> ResultReady;
         public event EventHandler<FrameReadyEventArgs> FrameReady;
@@ -70,6 +73,24 @@ namespace Capture.Vision.Maui
         {
             get { return (bool)GetValue(EnableBarcodeProperty); }
             set { SetValue(EnableBarcodeProperty, value); }
+        }
+
+        public bool EnableDocumentDetect
+        {
+            get { return (bool)GetValue(EnableDocumentDetectProperty); }
+            set { SetValue(EnableDocumentDetectProperty, value); }
+        }
+
+        public bool EnableDocumentRectify
+        {
+            get { return (bool)GetValue(EnableDocumentRectifyProperty); }
+            set { SetValue(EnableDocumentRectifyProperty, value); }
+        }
+
+        public bool EnableMrz
+        {
+            get { return (bool)GetValue(EnableMrzProperty); }
+            set { SetValue(EnableMrzProperty, value); }
         }
 
         public bool ShowCameraView

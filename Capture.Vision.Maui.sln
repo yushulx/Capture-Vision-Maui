@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33712.159
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Capture.Vision.Maui.Example", "Capture.Vision.Maui.Example\Capture.Vision.Maui.Example.csproj", "{9E2C001F-B767-4478-939C-288C8E8DD5F2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Capture.Vision.Maui.Example", "Capture.Vision.Maui.Example\Capture.Vision.Maui.Example.csproj", "{9E2C001F-B767-4478-939C-288C8E8DD5F2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Capture.Vision.Maui", "Capture.Vision.Maui\Capture.Vision.Maui.csproj", "{DFDA62F0-D62C-4E3C-BF8E-CCE47E16CA0D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Capture.Vision.Maui", "Capture.Vision.Maui\Capture.Vision.Maui.csproj", "{DFDA62F0-D62C-4E3C-BF8E-CCE47E16CA0D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
