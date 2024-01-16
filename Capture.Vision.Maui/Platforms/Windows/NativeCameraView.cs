@@ -106,7 +106,11 @@ namespace Capture.Vision.Maui.Platforms.Windows
                             if (cameraView.EnableDocumentRectify)
                             {
                                 NormalizedImage image = documentScanner.NormalizeBuffer(buffer, bitmap.PixelWidth, bitmap.PixelHeight, bitmap.PixelWidth, DocumentScanner.ImagePixelFormat.IPF_GRAYSCALED, documentResults.Points);
-                                documentResults.Image = image;
+                                documentResults.Width = image.Width;
+                                documentResults.Height = image.Height;
+                                documentResults.Stride = image.Stride;
+                                documentResults.Format = image.Format;
+                                documentResults.Data = image.Data;
                             }
                         }
 
@@ -117,7 +121,48 @@ namespace Capture.Vision.Maui.Platforms.Windows
                     if (cameraView.EnableMrz)
                     {
                         MrzScanner.Result[] results = mrzScanner.DetectBuffer(buffer, bitmap.PixelWidth, bitmap.PixelHeight, bitmap.PixelWidth, MrzScanner.ImagePixelFormat.IPF_GRAYSCALED);
-                        cameraView.NotifyResultReady(results, bitmap.PixelWidth, bitmap.PixelHeight);
+                        MrzResult mrzResults = null;
+
+                        if (results != null && results.Length > 0)
+                        {
+                            Line[] rawData = new Line[results.Length];
+                            string[] lines = new string[results.Length];
+
+                            for (int i = 0; i < results.Length; i++)
+                            {
+                                rawData[i] = new Line()
+                                {
+                                    Confidence = results[i].Confidence,
+                                    Text = results[i].Text,
+                                    Points = results[i].Points,
+                                };
+                                lines[i] = results[i].Text;
+                            }
+
+                            try
+                            {
+                                Dynamsoft.MrzResult info = MrzParser.Parse(lines);
+                                mrzResults = new MrzResult()
+                                {
+                                    RawData = rawData,
+                                    Type = info.Type,
+                                    Nationality = info.Nationality,
+                                    Surname = info.Surname,
+                                    GivenName = info.GivenName,
+                                    PassportNumber = info.PassportNumber,
+                                    IssuingCountry = info.IssuingCountry,
+                                    BirthDate = info.BirthDate,
+                                    Gender = info.Gender,
+                                    Expiration = info.Expiration,
+                                    Lines = info.Lines
+                                };
+                            }
+                            catch (Exception ex) { 
+                                
+                            }
+                        }
+
+                        cameraView.NotifyResultReady(mrzResults, bitmap.PixelWidth, bitmap.PixelHeight);
                     }
                     
                     bitmap.Dispose();

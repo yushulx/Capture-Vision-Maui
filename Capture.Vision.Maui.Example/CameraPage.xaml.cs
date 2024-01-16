@@ -20,14 +20,14 @@ public class DocumentData
 public class MrzData
 {
     public MrzResult Reference { get; set; }
-    public SKPoint[] Points;
+    public SKPoint[][] Points;
 }
 
 public partial class CameraPage : ContentPage
 {
     BarcodeQrData[] barcodeData = null;
     DocumentData documentData = null;
-    MrzResult mrzData = null;
+    MrzData mrzData = null;
     private int imageWidth;
     private int imageHeight;
     bool saveImage = true;
@@ -158,7 +158,7 @@ public partial class CameraPage : ContentPage
                     {
                         documentData = new DocumentData()
                         {
-                            Reference = (DocumentResult)e.Result
+                            Reference = documentResult
                         };
                         int[] coordinates = documentData.Reference.Points;
                         if (coordinates != null && coordinates.Length == 8)
@@ -190,7 +190,34 @@ public partial class CameraPage : ContentPage
 
                     if (mrzResult != null)
                     {
+                        mrzData = new MrzData()
+                        {
+                            Reference = mrzResult
+                        };
 
+                        Line[] rawData = mrzData.Reference.RawData;
+                        mrzData.Points = new SKPoint[rawData.Length][];
+                        for (int index = 0; index < rawData.Length; index++)
+                        {
+                            Line line = rawData[index];
+                            int[] coordinates = line.Points;
+                            mrzData.Points[index] = new SKPoint[4];
+                            for (int i = 0; i < 4; ++i)
+                            {
+                                SKPoint p = new SKPoint();
+                                p.X = coordinates[i * 2];
+                                p.Y = coordinates[i * 2 + 1];
+                                mrzData.Points[index][i] = p;
+
+                                if (orientation == DisplayOrientation.Portrait)
+                                {
+                                    mrzData.Points[index][i] = rotateCW90(mrzData.Points[index][i], imageHeight);
+                                }
+
+                                mrzData.Points[index][i].X = (float)(mrzData.Points[index][i].X / scale);
+                                mrzData.Points[index][i].Y = (float)(mrzData.Points[index][i].Y / scale);
+                            }
+                        }
                     }
                 }
                 
@@ -251,8 +278,8 @@ public partial class CameraPage : ContentPage
                 {
                     Style = SKPaintStyle.Stroke,
                     Color = SKColors.Blue,
-                    TextSize = (float)(18 * density),
-                    StrokeWidth = 4,
+                    TextSize = (float)(16 * density),
+                    StrokeWidth = 1,
                 };
 
                 foreach (BarcodeQrData barcodeQrData in barcodeData)
@@ -278,8 +305,8 @@ public partial class CameraPage : ContentPage
                 {
                     Style = SKPaintStyle.Stroke,
                     Color = SKColors.Red,
-                    TextSize = (float)(18 * density),
-                    StrokeWidth = 4,
+                    TextSize = (float)(16 * density),
+                    StrokeWidth = 1,
                 };
 
                 canvas.DrawText("Detected Document", documentData.Points[0], textPaint);
@@ -302,9 +329,38 @@ public partial class CameraPage : ContentPage
                 {
                     Style = SKPaintStyle.Stroke,
                     Color = SKColors.Yellow,
-                    TextSize = (float)(18 * density),
-                    StrokeWidth = 4,
+                    TextSize = (float)(16 * density),
+                    StrokeWidth = 1,
                 };
+
+                foreach (SKPoint[] line in mrzData.Points) {
+                    canvas.DrawLine(line[0], line[1], skPaint);
+                    canvas.DrawLine(line[1], line[2], skPaint);
+                    canvas.DrawLine(line[2], line[3], skPaint);
+                    canvas.DrawLine(line[3], line[0], skPaint);
+                }
+
+                SKPoint start = mrzData.Points[0][0];
+                int delta = 20;
+                start.X += 200;
+                start.Y -= 200;
+                canvas.DrawText(mrzData.Reference.Type, start, textPaint);
+                start.Y += delta;
+                canvas.DrawText(mrzData.Reference.Nationality, start, textPaint);
+                start.Y += delta;
+                canvas.DrawText(mrzData.Reference.Surname, start, textPaint);
+                start.Y += delta;
+                canvas.DrawText(mrzData.Reference.GivenName, start, textPaint);
+                start.Y += delta;
+                canvas.DrawText(mrzData.Reference.PassportNumber, start, textPaint);
+                start.Y += delta;
+                canvas.DrawText(mrzData.Reference.IssuingCountry, start, textPaint);
+                start.Y += delta;
+                canvas.DrawText(mrzData.Reference.BirthDate, start, textPaint);
+                start.Y += delta;
+                canvas.DrawText(mrzData.Reference.Gender, start, textPaint);
+                start.Y += delta;
+                canvas.DrawText(mrzData.Reference.Expiration, start, textPaint);
             }
         }
     }
