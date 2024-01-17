@@ -8,13 +8,34 @@
     <ScrollView>
         <Grid>
             <cv:CameraView x:Name="cameraView" HorizontalOptions="FillAndExpand"
-			VerticalOptions="FillAndExpand" EnableBarcode="True" EnableDocumentDetect="True" EnableMrz="True"
+			VerticalOptions="FillAndExpand"
                                 ResultReady="cameraView_ResultReady" FrameReady="cameraView_FrameReady"
                                />
             <skia:SKCanvasView x:Name="canvasView" 
                            Margin="0"
                            HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand"
                            PaintSurface="OnCanvasViewPaintSurface" />
+
+            <HorizontalStackLayout HorizontalOptions="Center" VerticalOptions="Start" Spacing="10">
+                <!-- First Checkbox and Label -->
+                <HorizontalStackLayout>
+                    <CheckBox x:Name="checkBoxBarcode" />
+                    <Label Text="Barcode" VerticalOptions="Center" />
+                </HorizontalStackLayout>
+
+                <!-- Second Checkbox and Label -->
+                <HorizontalStackLayout>
+                    <CheckBox x:Name="checkBoxDocument" />
+                    <Label Text="Document" VerticalOptions="Center" />
+                </HorizontalStackLayout>
+
+                <!-- Third Checkbox and Label -->
+                <HorizontalStackLayout>
+                    <CheckBox x:Name="checkBoxMrz" />
+                    <Label Text="MRZ" VerticalOptions="Center" />
+                </HorizontalStackLayout>
+            </HorizontalStackLayout>
+
         </Grid>
     </ScrollView>
 </ContentPage>

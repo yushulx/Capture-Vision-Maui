@@ -105,15 +105,12 @@ The project's goal is to assist developers in creating .NET MAUI applications fe
     ```csharp
     private void cameraView_ResultReady(object sender, ResultReadyEventArgs e)
     {
-        if (e.Result != null)
-        {
-            if (e.Result is BarcodeResult[])
-            {}
-            else if (e.Result is DocumentResult)
-            {}
-            else if (e.Result is MrzResult)
-            {}            
-        }
+        if (e.Result is BarcodeResult[])
+        {}
+        else if (e.Result is DocumentResult)
+        {}
+        else if (e.Result is MrzResult)
+        {}    
     }
     ```
 

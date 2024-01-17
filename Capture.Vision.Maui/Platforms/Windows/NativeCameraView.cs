@@ -72,7 +72,7 @@ namespace Capture.Vision.Maui.Platforms.Windows
                     if (cameraView.EnableBarcode)
                     {
                         BarcodeQRCodeReader.Result[] results = barcodeReader.DecodeBuffer(buffer, bitmap.PixelWidth, bitmap.PixelHeight, bitmap.PixelWidth, BarcodeQRCodeReader.ImagePixelFormat.IPF_GRAYSCALED);
-                        BarcodeResult[] barcodeResults = null;
+                        BarcodeResult[] barcodeResults = new BarcodeResult[0];
                         if (results != null && results.Length > 0)
                         {
                             barcodeResults = new BarcodeResult[results.Length];
@@ -94,7 +94,7 @@ namespace Capture.Vision.Maui.Platforms.Windows
                     if (cameraView.EnableDocumentDetect)
                     {
                         DocumentScanner.Result[] results = documentScanner.DetectBuffer(buffer, bitmap.PixelWidth, bitmap.PixelHeight, bitmap.PixelWidth, DocumentScanner.ImagePixelFormat.IPF_GRAYSCALED);
-                        DocumentResult documentResults = null;
+                        DocumentResult documentResults = new DocumentResult();
                         if (results != null && results.Length > 0)
                         {
                             documentResults = new DocumentResult
@@ -121,7 +121,7 @@ namespace Capture.Vision.Maui.Platforms.Windows
                     if (cameraView.EnableMrz)
                     {
                         MrzScanner.Result[] results = mrzScanner.DetectBuffer(buffer, bitmap.PixelWidth, bitmap.PixelHeight, bitmap.PixelWidth, MrzScanner.ImagePixelFormat.IPF_GRAYSCALED);
-                        MrzResult mrzResults = null;
+                        MrzResult mrzResults = new MrzResult();
 
                         if (results != null && results.Length > 0)
                         {

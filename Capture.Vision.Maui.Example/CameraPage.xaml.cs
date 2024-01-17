@@ -47,6 +47,9 @@ public partial class CameraPage : ContentPage
         rotation = mainDisplayInfo.Rotation;
         density = mainDisplayInfo.Density;
         //cameraView.BarcodeParameters = "{\"Version\":\"3.0\", \"ImageParameter\":{\"Name\":\"IP1\", \"BarcodeFormatIds\":[\"BF_QR_CODE\", \"BF_ONED\"], \"ExpectedBarcodesCount\":20}}";
+        checkBoxBarcode.CheckedChanged += OnBarcodeCheckedChanged;
+        checkBoxDocument.CheckedChanged += OnDocumentCheckedChanged;
+        checkBoxMrz.CheckedChanged += OnMrzCheckedChanged;
     }
 
     private void OnDisappearing(object sender, EventArgs e)
@@ -54,8 +57,39 @@ public partial class CameraPage : ContentPage
         cameraView.ShowCameraView = false;
     }
 
+    private void OnBarcodeCheckedChanged(object sender, CheckedChangedEventArgs e)
+    {
+        cameraView.EnableBarcode = e.Value;
+        if (!cameraView.EnableBarcode)
+        {
+            barcodeData = null;
+        }
+    }
+
+    private void OnDocumentCheckedChanged(object sender, CheckedChangedEventArgs e)
+    {
+        cameraView.EnableDocumentDetect = e.Value;
+        if (!cameraView.EnableDocumentDetect)
+        {
+            documentData = null;
+        }
+    }
+
+    private void OnMrzCheckedChanged(object sender, CheckedChangedEventArgs e)
+    {
+        cameraView.EnableMrz = e.Value;
+        if (!cameraView.EnableMrz)
+        {
+            mrzData = null;
+        }
+    }
+
     private void cameraView_FrameReady(object sender, FrameReadyEventArgs e)
     {
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            canvasView.InvalidateSurface();
+        });
         // process image
         if (saveImage)
         {
@@ -89,152 +123,137 @@ public partial class CameraPage : ContentPage
     {
         lock (_lockObject)
         {
-            if (e.Result != null)
+            imageWidth = e.PreviewWidth;
+            imageHeight = e.PreviewHeight;
+            if (orientation == DisplayOrientation.Portrait)
             {
-                imageWidth = e.PreviewWidth;
-                imageHeight = e.PreviewHeight;
-                if (orientation == DisplayOrientation.Portrait)
-                {
-                    widthScale = imageHeight / width;
-                    heightScale = imageWidth / height;
-                    scale = widthScale < heightScale ? widthScale : heightScale;
-                    scaledWidth = imageHeight / scale;
-                    scaledHeight = imageWidth / scale;
-                }
-                else
-                {
-                    widthScale = imageWidth / width;
-                    heightScale = imageHeight / height;
-                    scale = widthScale < heightScale ? widthScale : heightScale;
-                    scaledWidth = imageWidth / scale;
-                    scaledHeight = imageHeight / scale;
-                }
-
-                if (e.Result is BarcodeResult[])
-                {
-                    barcodeData = null;
-                    BarcodeResult[] barcodeResults = (BarcodeResult[])e.Result;
-
-                    if (barcodeResults != null && barcodeResults.Length > 0)
-                    {
-                        barcodeData = new BarcodeQrData[barcodeResults.Length];
-
-                        for (int index = 0; index < barcodeResults.Length; ++index)
-                        {
-                            barcodeData[index] = new BarcodeQrData()
-                            {
-                                Reference = barcodeResults[index]
-                            };
-                            int[] coordinates = barcodeResults[index].Points;
-                            if (coordinates != null && coordinates.Length == 8)
-                            {
-                                barcodeData[index].Points = new SKPoint[4];
-
-                                for (int i = 0; i < 4; ++i)
-                                {
-                                    SKPoint p = new SKPoint();
-                                    p.X = coordinates[i * 2];
-                                    p.Y = coordinates[i * 2 + 1];
-                                    barcodeData[index].Points[i] = p;
-
-                                    if (orientation == DisplayOrientation.Portrait)
-                                    {
-                                        barcodeData[index].Points[i] = rotateCW90(barcodeData[index].Points[i], imageHeight);
-                                    }
-
-                                    barcodeData[index].Points[i].X = (float)(barcodeData[index].Points[i].X / scale);
-                                    barcodeData[index].Points[i].Y = (float)(barcodeData[index].Points[i].Y / scale);
-                                }
-                            }
-                        }
-                    }
-                }
-                else if (e.Result is DocumentResult)
-                {
-                    documentData = null;
-                    DocumentResult documentResult = (DocumentResult)e.Result;
-
-                    if (documentResult != null)
-                    {
-                        documentData = new DocumentData()
-                        {
-                            Reference = documentResult
-                        };
-                        int[] coordinates = documentData.Reference.Points;
-                        if (coordinates != null && coordinates.Length == 8)
-                        {
-                            documentData.Points = new SKPoint[4];
-
-                            for (int i = 0; i < 4; ++i)
-                            {
-                                SKPoint p = new SKPoint();
-                                p.X = coordinates[i * 2];
-                                p.Y = coordinates[i * 2 + 1];
-                                documentData.Points[i] = p;
-
-                                if (orientation == DisplayOrientation.Portrait)
-                                {
-                                    documentData.Points[i] = rotateCW90(documentData.Points[i], imageHeight);
-                                }
-
-                                documentData.Points[i].X = (float)(documentData.Points[i].X / scale);
-                                documentData.Points[i].Y = (float)(documentData.Points[i].Y / scale);
-                            }
-                        }
-                    }
-                }
-                else if (e.Result is MrzResult)
-                {
-                    mrzData = null;
-                    MrzResult mrzResult = (MrzResult)e.Result;
-
-                    if (mrzResult != null)
-                    {
-                        mrzData = new MrzData()
-                        {
-                            Reference = mrzResult
-                        };
-
-                        Line[] rawData = mrzData.Reference.RawData;
-                        mrzData.Points = new SKPoint[rawData.Length][];
-                        for (int index = 0; index < rawData.Length; index++)
-                        {
-                            Line line = rawData[index];
-                            int[] coordinates = line.Points;
-                            mrzData.Points[index] = new SKPoint[4];
-                            for (int i = 0; i < 4; ++i)
-                            {
-                                SKPoint p = new SKPoint();
-                                p.X = coordinates[i * 2];
-                                p.Y = coordinates[i * 2 + 1];
-                                mrzData.Points[index][i] = p;
-
-                                if (orientation == DisplayOrientation.Portrait)
-                                {
-                                    mrzData.Points[index][i] = rotateCW90(mrzData.Points[index][i], imageHeight);
-                                }
-
-                                mrzData.Points[index][i].X = (float)(mrzData.Points[index][i].X / scale);
-                                mrzData.Points[index][i].Y = (float)(mrzData.Points[index][i].Y / scale);
-                            }
-                        }
-                    }
-                }
-                
+                widthScale = imageHeight / width;
+                heightScale = imageWidth / height;
+                scale = widthScale < heightScale ? widthScale : heightScale;
+                scaledWidth = imageHeight / scale;
+                scaledHeight = imageWidth / scale;
             }
             else
             {
+                widthScale = imageWidth / width;
+                heightScale = imageHeight / height;
+                scale = widthScale < heightScale ? widthScale : heightScale;
+                scaledWidth = imageWidth / scale;
+                scaledHeight = imageHeight / scale;
+            }
+
+            if (e.Result is BarcodeResult[])
+            {
                 barcodeData = null;
+                BarcodeResult[] barcodeResults = (BarcodeResult[])e.Result;
+
+                if (barcodeResults != null && barcodeResults.Length > 0)
+                {
+                    barcodeData = new BarcodeQrData[barcodeResults.Length];
+
+                    for (int index = 0; index < barcodeResults.Length; ++index)
+                    {
+                        barcodeData[index] = new BarcodeQrData()
+                        {
+                            Reference = barcodeResults[index]
+                        };
+                        int[] coordinates = barcodeResults[index].Points;
+                        if (coordinates != null && coordinates.Length == 8)
+                        {
+                            barcodeData[index].Points = new SKPoint[4];
+
+                            for (int i = 0; i < 4; ++i)
+                            {
+                                SKPoint p = new SKPoint();
+                                p.X = coordinates[i * 2];
+                                p.Y = coordinates[i * 2 + 1];
+                                barcodeData[index].Points[i] = p;
+
+                                if (orientation == DisplayOrientation.Portrait)
+                                {
+                                    barcodeData[index].Points[i] = rotateCW90(barcodeData[index].Points[i], imageHeight);
+                                }
+
+                                barcodeData[index].Points[i].X = (float)(barcodeData[index].Points[i].X / scale);
+                                barcodeData[index].Points[i].Y = (float)(barcodeData[index].Points[i].Y / scale);
+                            }
+                        }
+                    }
+                }
+            }
+            else if (e.Result is DocumentResult)
+            {
                 documentData = null;
+                DocumentResult documentResult = (DocumentResult)e.Result;
+
+                if (documentResult.Points != null)
+                {
+                    documentData = new DocumentData()
+                    {
+                        Reference = documentResult
+                    };
+                    int[] coordinates = documentData.Reference.Points;
+                    if (coordinates != null && coordinates.Length == 8)
+                    {
+                        documentData.Points = new SKPoint[4];
+
+                        for (int i = 0; i < 4; ++i)
+                        {
+                            SKPoint p = new SKPoint();
+                            p.X = coordinates[i * 2];
+                            p.Y = coordinates[i * 2 + 1];
+                            documentData.Points[i] = p;
+
+                            if (orientation == DisplayOrientation.Portrait)
+                            {
+                                documentData.Points[i] = rotateCW90(documentData.Points[i], imageHeight);
+                            }
+
+                            documentData.Points[i].X = (float)(documentData.Points[i].X / scale);
+                            documentData.Points[i].Y = (float)(documentData.Points[i].Y / scale);
+                        }
+                    }
+                }
+            }
+            else if (e.Result is MrzResult)
+            {
                 mrzData = null;
+                MrzResult mrzResult = (MrzResult)e.Result;
+
+                if (mrzResult.RawData != null)
+                {
+                    mrzData = new MrzData()
+                    {
+                        Reference = mrzResult
+                    };
+
+                    Line[] rawData = mrzData.Reference.RawData;
+                    mrzData.Points = new SKPoint[rawData.Length][];
+                    for (int index = 0; index < rawData.Length; index++)
+                    {
+                        Line line = rawData[index];
+                        int[] coordinates = line.Points;
+                        mrzData.Points[index] = new SKPoint[4];
+                        for (int i = 0; i < 4; ++i)
+                        {
+                            SKPoint p = new SKPoint();
+                            p.X = coordinates[i * 2];
+                            p.Y = coordinates[i * 2 + 1];
+                            mrzData.Points[index][i] = p;
+
+                            if (orientation == DisplayOrientation.Portrait)
+                            {
+                                mrzData.Points[index][i] = rotateCW90(mrzData.Points[index][i], imageHeight);
+                            }
+
+                            mrzData.Points[index][i].X = (float)(mrzData.Points[index][i].X / scale);
+                            mrzData.Points[index][i].Y = (float)(mrzData.Points[index][i].Y / scale);
+                        }
+                    }
+                }
             }
         }
-            
 
-        MainThread.BeginInvokeOnMainThread(() =>
-        {
-            canvasView.InvalidateSurface();
-        });
     }
 
     public static SKPoint rotateCW90(SKPoint point, int width)
@@ -265,7 +284,7 @@ public partial class CameraPage : ContentPage
 
         lock (_lockObject)
         {
-            if (barcodeData != null)
+            if (barcodeData != null && cameraView.EnableBarcode)
             {
                 SKPaint skPaint = new SKPaint
                 {
@@ -292,7 +311,7 @@ public partial class CameraPage : ContentPage
                 }
             }
 
-            if (documentData != null)
+            if (documentData != null && cameraView.EnableDocumentDetect)
             {
                 SKPaint skPaint = new SKPaint
                 {
@@ -316,7 +335,7 @@ public partial class CameraPage : ContentPage
                 canvas.DrawLine(documentData.Points[3], documentData.Points[0], skPaint);
             }
 
-            if (mrzData != null)
+            if (mrzData != null && cameraView.EnableMrz)
             {
                 SKPaint skPaint = new SKPaint
                 {
