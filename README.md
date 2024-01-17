@@ -4,7 +4,7 @@ The project's goal is to assist developers in creating .NET MAUI applications fe
 ## Example
 [https://github.com/yushulx/Capture-Vision-Maui/tree/main/Capture.Vision.Maui.Example](https://github.com/yushulx/Capture-Vision-Maui/tree/main/Capture.Vision.Maui.Example)
 
-![.NET MAUI Windows QR code scanner](https://www.dynamsoft.com/codepool/img/2024/01/dotnet-maui-barcode-document-mrz.png)
+![.NET MAUI Windows QR code scanner](https://camo.githubusercontent.com/5b212f793f3ae53c7d2d2ba926f9edafeb3c117b9f63b2ea2ab668cc8938732f/68747470733a2f2f7777772e64796e616d736f66742e636f6d2f636f6465706f6f6c2f696d672f323032342f30312f646f746e65742d6d6175692d626172636f64652d646f63756d656e742d6d727a2e706e67)
 
 ## Demo Video: .NET MAUI QR Code Scanner
 
