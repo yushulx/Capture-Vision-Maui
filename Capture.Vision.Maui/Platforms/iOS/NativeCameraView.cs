@@ -78,7 +78,7 @@ namespace Capture.Vision.Maui.Platforms.iOS
                                             (int)height,
                                             (int)bpr,
                                             BarcodeQRCodeReader.ImagePixelFormat.IPF_ARGB_8888);
-                    BarcodeResult[] barcodeResults = null;
+                    BarcodeResult[] barcodeResults = new BarcodeResult[0];
                     if (results != null && results.Length > 0)
                     {
                         barcodeResults = new BarcodeResult[results.Length];

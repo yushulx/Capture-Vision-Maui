@@ -375,7 +375,7 @@ namespace Capture.Vision.Maui.Platforms.Android
                     if (cameraView.EnableBarcode)
                     {
                         Result[] results = barcodeReader.DecodeBuffer(bytes, width, height, nPixelStride * nRowStride, BarcodeQRCodeReader.ImagePixelFormat.IPF_GRAYSCALED);
-                        BarcodeResult[] barcodeResults = null;
+                        BarcodeResult[] barcodeResults = new BarcodeResult[0];
                         if (results != null && results.Length > 0)
                         {
                             barcodeResults = new BarcodeResult[results.Length];
