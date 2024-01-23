@@ -170,7 +170,7 @@ public CameraPage()
 ```
 
 ## TODO
-- MRZ detection (Android, iOS)
+- MRZ detection (iOS)
 - Document detection (Android, iOS)
 
 

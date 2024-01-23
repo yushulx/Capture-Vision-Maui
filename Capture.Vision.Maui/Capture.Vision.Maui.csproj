@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>1.2.1</Version>
+		<Version>1.3.0</Version>
 		<TargetFrameworks>net7.0;net7.0-android;net7.0-ios</TargetFrameworks>
 		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">
 			$(TargetFrameworks);net7.0-windows10.0.19041.0</TargetFrameworks>
@@ -24,13 +24,15 @@
 		<TargetPlatformMinVersion
 			Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
 			10.0.17763.0</TargetPlatformMinVersion>
-		<Description>The plugin aims to assist developers in creating .NET MAUI applications featuring a custom camera view. It utilizes Dynamsoft Vision SDKs for barcode, MRZ (Machine Readable Zone), and document detection.</Description>
+		<Description>The plugin aims to assist developers in creating .NET MAUI applications
+			featuring a custom camera view. It utilizes Dynamsoft Vision SDKs for barcode, MRZ
+			(Machine Readable Zone), and document detection.</Description>
 		<PackageProjectUrl>https://github.com/yushulx/Capture-Vision-Maui</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/yushulx/Capture-Vision-Maui</RepositoryUrl>
 		<PackageTags>
 			barcode;qrcode;Aztec;QR;Datamatrix;PDF417;Code39;Code93;Code128;Codabar;Interleaved;EAN-8;EAN-13;UPC-A;UPC-E;GS1Databar;PatchCode;Maxicode;COMPOSITE;PostalCode;document;MRZ;passport;ID;visa</PackageTags>
 		<PackageReleaseNotes>
-			- Changed "e.Result" to a non-nullable value in the "cameraView_ResultReady()" callback.
+			- Added MRZ for Android
 		</PackageReleaseNotes>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -52,10 +54,13 @@
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net7.0-android'">
-		<PackageReference Include="MrzSDK">
+		<!--<PackageReference
+		Include="MrzSDK">
 			<Version>0.1.2</Version>
-		</PackageReference>
-
+		</PackageReference>-->
+		<PackageReference
+		Include="MrzScannerSDK" Version="1.3.5" />
+		<!--<ProjectReference Include="..\..\dotnet-mrz-sdk\android\sdk\MrzScannerSDK.csproj" />-->
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net7.0-ios'">
@@ -64,6 +69,8 @@
 
 	<ItemGroup Condition="$([MSBuild]::IsOSPlatform('windows'))">
 		<PackageReference Include="DocumentScannerSDK " Version="1.1.0" />
-		<PackageReference Include="MrzScannerSDK" Version="1.3.3" />
+		<PackageReference Include="MrzScannerSDK" Version="1.3.5" />
+		<!--<ProjectReference
+		Include="..\..\dotnet-mrz-sdk\desktop\MrzScannerSDK.csproj" />-->
 	</ItemGroup>
 </Project>

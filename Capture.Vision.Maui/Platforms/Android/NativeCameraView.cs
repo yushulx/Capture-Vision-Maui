@@ -16,6 +16,7 @@ using Class = Java.Lang.Class;
 using static Capture.Vision.Maui.CameraInfo;
 using Dynamsoft;
 using static Dynamsoft.BarcodeQRCodeReader;
+using static Dynamsoft.MrzScanner;
 using Java.Nio;
 
 namespace Capture.Vision.Maui.Platforms.Android
@@ -42,6 +43,7 @@ namespace Capture.Vision.Maui.Platforms.Android
         private Handler backgroundHandler;
         private ImageReader imageReader;
         private BarcodeQRCodeReader barcodeReader;
+        private MrzScanner mrzScanner;
 
         public NativeCameraView(Context context, CameraView cameraView) : base(context)
         {
@@ -63,6 +65,8 @@ namespace Capture.Vision.Maui.Platforms.Android
             {
                 barcodeReader.SetParameters(cameraView.BarcodeParameters);
             }
+
+            mrzScanner = MrzScanner.Create();
         }
 
         private void InitCameras()
@@ -119,7 +123,7 @@ namespace Capture.Vision.Maui.Platforms.Android
             backgroundThread = new HandlerThread("CameraBackground");
             backgroundThread.Start();
             backgroundHandler = new Handler(backgroundThread.Looper);
-            frameListener = new ImageAvailableListener(cameraView, barcodeReader);
+            frameListener = new ImageAvailableListener(cameraView, barcodeReader, mrzScanner);
             imageReader.SetOnImageAvailableListener(frameListener, backgroundHandler);
             surfaces.Add(new OutputConfiguration(imageReader.Surface));
             previewBuilder.AddTarget(imageReader.Surface);
@@ -344,11 +348,13 @@ namespace Capture.Vision.Maui.Platforms.Android
             private readonly CameraView cameraView;
             internal bool isReady = true;
             private BarcodeQRCodeReader barcodeReader;
+            private MrzScanner mrzScanner;
 
-            public ImageAvailableListener(CameraView camView, BarcodeQRCodeReader barcodeReader)
+            public ImageAvailableListener(CameraView camView, BarcodeQRCodeReader barcodeReader, MrzScanner scanner)
             {
                 cameraView = camView;
                 this.barcodeReader = barcodeReader;
+                this.mrzScanner = scanner;
             }
 
             public void OnImageAvailable(ImageReader reader)
@@ -374,7 +380,7 @@ namespace Capture.Vision.Maui.Platforms.Android
                     cameraView.NotifyFrameReady(bytes, width, height, nPixelStride * nRowStride, FrameReadyEventArgs.PixelFormat.GRAYSCALE);
                     if (cameraView.EnableBarcode)
                     {
-                        Result[] results = barcodeReader.DecodeBuffer(bytes, width, height, nPixelStride * nRowStride, BarcodeQRCodeReader.ImagePixelFormat.IPF_GRAYSCALED);
+                        BarcodeQRCodeReader.Result[] results = barcodeReader.DecodeBuffer(bytes, width, height, nPixelStride * nRowStride, BarcodeQRCodeReader.ImagePixelFormat.IPF_GRAYSCALED);
                         BarcodeResult[] barcodeResults = new BarcodeResult[0];
                         if (results != null && results.Length > 0)
                         {
@@ -393,7 +399,59 @@ namespace Capture.Vision.Maui.Platforms.Android
                         }
                         cameraView.NotifyResultReady(barcodeResults, width, height);
                     }
-                        
+
+                    if (cameraView.EnableMrz)
+                    {
+                        MrzResult mrzResults = new MrzResult();
+                        try
+                        {
+                            MrzScanner.Result[] results = mrzScanner.DetectBuffer(bytes, width, height, nPixelStride * nRowStride, MrzScanner.ImagePixelFormat.IPF_GRAYSCALED);
+
+
+                            if (results != null && results.Length > 0)
+                            {
+                                Line[] rawData = new Line[results.Length];
+                                string[] lines = new string[results.Length];
+
+                                for (int i = 0; i < results.Length; i++)
+                                {
+                                    rawData[i] = new Line()
+                                    {
+                                        Confidence = results[i].Confidence,
+                                        Text = results[i].Text,
+                                        Points = results[i].Points,
+                                    };
+                                    lines[i] = results[i].Text;
+                                }
+
+
+                                Dynamsoft.MrzResult info = MrzParser.Parse(lines);
+                                mrzResults = new MrzResult()
+                                {
+                                    RawData = rawData,
+                                    Type = info.Type,
+                                    Nationality = info.Nationality,
+                                    Surname = info.Surname,
+                                    GivenName = info.GivenName,
+                                    PassportNumber = info.PassportNumber,
+                                    IssuingCountry = info.IssuingCountry,
+                                    BirthDate = info.BirthDate,
+                                    Gender = info.Gender,
+                                    Expiration = info.Expiration,
+                                    Lines = info.Lines
+                                };
+
+                            }
+                        }
+
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine(ex.Message);
+                        }
+
+                        cameraView.NotifyResultReady(mrzResults, width, height);
+                    }
+
                 }
                 catch (Exception ex)
                 {

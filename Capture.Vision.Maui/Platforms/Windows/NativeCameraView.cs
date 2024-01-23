@@ -54,8 +54,6 @@ namespace Capture.Vision.Maui.Platforms.Windows
             documentScanner = DocumentScanner.Create();
 
             mrzScanner = MrzScanner.Create();
-            int ret = mrzScanner.LoadModel();
-            Console.WriteLine("LoadModel: " + ret);
         }
 
         private void ProcessFrames()
