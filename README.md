@@ -33,43 +33,50 @@ The project's goal is to assist developers in creating .NET MAUI applications fe
     builder.UseNativeCameraView()
     ```
 
-2. Request a [free trial license](https://www.dynamsoft.com/customer/license/trialLicense) and replace `LICENSE-KEY` with your own license key in `MainPage.xaml.cs`:
+2. Request a [free trial license](https://www.dynamsoft.com/customer/license/trialLicense) and replace `LICENSE-KEY` with your own license key.
+    
+    **Windows App.xaml.cs**
 
     ```csharp
+    using Dynamsoft;
+    using Microsoft.UI.Xaml;
+    namespace Capture.Vision.Maui.Example.WinUI
+    {
+        public partial class App : MauiWinUIApplication
+        {
+            public App()
+            {
+                this.InitializeComponent();
+                BarcodeQRCodeReader.InitLicense("LICENSE-KEY");
+                DocumentScanner.InitLicense("LICENSE-KEY");
+                MrzScanner.InitLicense("LICENSE-KEY");
+            }
+    
+            protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
+        }
+    }
+    ```
+
+    **Android MainActivity.cs**
+
+    ```csharp
+    using Android.App;
+    using Android.Content.PM;
+    using Android.OS;
     using Dynamsoft;
     
     namespace Capture.Vision.Maui.Example
     {
-        public partial class MainPage : ContentPage
+        [Activity(Theme = "@style/Maui.SplashTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density)]
+        public class MainActivity : MauiAppCompatActivity
         {
-            public MainPage()
+            protected override void OnCreate(Bundle savedInstanceState)
             {
-                InitializeComponent();
-                InitService();
-            }
+                base.OnCreate(savedInstanceState);
     
-            private async void InitService()
-            {
-                await Task.Run(() =>
-                {
-                    BarcodeQRCodeReader.InitLicense("LICENSE-KEY");
-
-                    #if WINDOWS
-                        DocumentScanner.InitLicense("LICENSE-KEY"); 
-                        MrzScanner.InitLicense("LICENSE-KEY"); 
-                    #elif ANDROID
-                                    
-                    #elif IOS
-                       
-                    #endif
-    
-                    return Task.CompletedTask;
-                });
-            }
-    
-            async void OnTakeVideoButtonClicked(object sender, EventArgs e)
-            {
-                await Navigation.PushAsync(new CameraPage());
+                // Your platform-specific code here
+                BarcodeQRCodeReader.InitLicense("LICENSE-KEY");
+                MrzScanner.InitLicense("LICENSE-KEY", this);
             }
         }
     }
