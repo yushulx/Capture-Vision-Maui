@@ -23,7 +23,7 @@ The project's goal is to assist developers in creating .NET MAUI applications fe
 
 ## Features
 - Read 1D barcodes, QR codes, PDF417, DataMatrix, and other formats from camera frames.
-- Recognize Machine Readable Zones (MRZ) from camera frames (**Windows only**).
+- Recognize Machine Readable Zones (MRZ) from camera frames (**Windows & Android**).
 - Detect document edges within camera frames (**Windows only**).
 
 ## Getting Started
@@ -186,3 +186,11 @@ public CameraPage()
 - Barcode: [https://github.com/yushulx/dotnet-barcode-qr-code-sdk](https://github.com/yushulx/dotnet-barcode-qr-code-sdk)
 - MRZ Detection: [https://github.com/yushulx/dotnet-mrz-sdk](https://github.com/yushulx/dotnet-mrz-sdk)
 - Document Detection and Rectification: [https://github.com/yushulx/dotnet-document-scanner-sdk](https://github.com/yushulx/dotnet-document-scanner-sdk)
+
+
+## Building NuGet Package from Source Code
+
+```bash
+cd Capture.Vision.Maui
+dotnet build --configuration Release
+```
