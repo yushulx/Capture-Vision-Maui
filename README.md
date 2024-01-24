@@ -184,8 +184,7 @@ public CameraPage()
 ## References
 - Camera: [https://github.com/hjam40/Camera.MAUI](https://github.com/hjam40/Camera.MAUI)
 - Barcode: [https://github.com/yushulx/dotnet-barcode-qr-code-sdk](https://github.com/yushulx/dotnet-barcode-qr-code-sdk)
-- MRZ Detection: [https://github.com/yushulx/dotnet-mrz-sdk](https://github.com/yushulx/dotnet-mrz-sdk)
-- Document Detection and Rectification: [https://github.com/yushulx/dotnet-document-scanner-sdk](https://github.com/yushulx/dotnet-document-scanner-sdk)
+- Capture Vision: [https://github.com/yushulx/Capture-Vision](https://github.com/yushulx/Capture-Vision)
 
 
 ## Building NuGet Package from Source Code
