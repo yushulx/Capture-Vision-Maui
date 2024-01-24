@@ -24,7 +24,7 @@ The project's goal is to assist developers in creating .NET MAUI applications fe
 ## Features
 - Read 1D barcodes, QR codes, PDF417, DataMatrix, and other formats from camera frames.
 - Recognize Machine Readable Zones (MRZ) from camera frames (**Windows & Android**).
-- Detect document edges within camera frames (**Windows only**).
+- Detect document edges within camera frames (**Windows & Android**).
 
 ## Getting Started
 1. Enable the camera view in `MauiProgram.cs`:
@@ -178,7 +178,7 @@ public CameraPage()
 
 ## TODO
 - MRZ detection (iOS)
-- Document detection (Android, iOS)
+- Document detection (iOS)
 
 
 ## References

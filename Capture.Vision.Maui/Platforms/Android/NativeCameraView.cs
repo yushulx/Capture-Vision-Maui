@@ -18,6 +18,7 @@ using Dynamsoft;
 using static Dynamsoft.BarcodeQRCodeReader;
 using static Dynamsoft.MrzScanner;
 using Java.Nio;
+using static Dynamsoft.DocumentScanner;
 
 namespace Capture.Vision.Maui.Platforms.Android
 {
@@ -44,7 +45,7 @@ namespace Capture.Vision.Maui.Platforms.Android
         private ImageReader imageReader;
         private BarcodeQRCodeReader barcodeReader;
         private MrzScanner mrzScanner;
-
+        private DocumentScanner documentScanner;
         public NativeCameraView(Context context, CameraView cameraView) : base(context)
         {
             this.context = context;
@@ -67,6 +68,7 @@ namespace Capture.Vision.Maui.Platforms.Android
             }
 
             mrzScanner = MrzScanner.Create();
+            documentScanner = DocumentScanner.Create();
         }
 
         private void InitCameras()
@@ -123,7 +125,7 @@ namespace Capture.Vision.Maui.Platforms.Android
             backgroundThread = new HandlerThread("CameraBackground");
             backgroundThread.Start();
             backgroundHandler = new Handler(backgroundThread.Looper);
-            frameListener = new ImageAvailableListener(cameraView, barcodeReader, mrzScanner);
+            frameListener = new ImageAvailableListener(cameraView, barcodeReader, mrzScanner, documentScanner);
             imageReader.SetOnImageAvailableListener(frameListener, backgroundHandler);
             surfaces.Add(new OutputConfiguration(imageReader.Surface));
             previewBuilder.AddTarget(imageReader.Surface);
@@ -349,12 +351,14 @@ namespace Capture.Vision.Maui.Platforms.Android
             internal bool isReady = true;
             private BarcodeQRCodeReader barcodeReader;
             private MrzScanner mrzScanner;
+            private DocumentScanner documentScanner;
 
-            public ImageAvailableListener(CameraView camView, BarcodeQRCodeReader barcodeReader, MrzScanner scanner)
+            public ImageAvailableListener(CameraView camView, BarcodeQRCodeReader barcodeReader, MrzScanner mrzScanner, DocumentScanner documentScanner)
             {
                 cameraView = camView;
                 this.barcodeReader = barcodeReader;
-                this.mrzScanner = scanner;
+                this.mrzScanner = mrzScanner;
+                this.documentScanner = documentScanner;
             }
 
             public void OnImageAvailable(ImageReader reader)
@@ -398,6 +402,33 @@ namespace Capture.Vision.Maui.Platforms.Android
                             }
                         }
                         cameraView.NotifyResultReady(barcodeResults, width, height);
+                    }
+
+                    if (cameraView.EnableDocumentDetect)
+                    {
+                        DocumentScanner.Result[] results = documentScanner.DetectBuffer(bytes, width, height, nPixelStride * nRowStride, DocumentScanner.ImagePixelFormat.IPF_GRAYSCALED);
+                        DocumentResult documentResults = new DocumentResult();
+                        if (results != null && results.Length > 0)
+                        {
+                            documentResults = new DocumentResult
+                            {
+                                Confidence = results[0].Confidence,
+                                Points = results[0].Points
+                            };
+
+                            if (cameraView.EnableDocumentRectify)
+                            {
+                                NormalizedImage normalizedImage = documentScanner.NormalizeBuffer(bytes, width, height, nPixelStride * nRowStride, DocumentScanner.ImagePixelFormat.IPF_GRAYSCALED, documentResults.Points);
+                                documentResults.Width = normalizedImage.Width;
+                                documentResults.Height = normalizedImage.Height;
+                                documentResults.Stride = normalizedImage.Stride;
+                                documentResults.Format = normalizedImage.Format;
+                                documentResults.Data = normalizedImage.Data;
+                            }
+                        }
+
+                        cameraView.NotifyResultReady(documentResults, width, height);
+
                     }
 
                     if (cameraView.EnableMrz)
