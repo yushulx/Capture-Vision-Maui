@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>1.4.0</Version>
+		<Version>1.4.1</Version>
 		<TargetFrameworks>net7.0;net7.0-android;net7.0-ios</TargetFrameworks>
 		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">
 			$(TargetFrameworks);net7.0-windows10.0.19041.0</TargetFrameworks>
@@ -40,7 +40,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="BarcodeQRCodeSDK" Version="2.3.4" />
+		<PackageReference Include="BarcodeQRCodeSDK" Version="2.3.6" />
 
 	</ItemGroup>
 
@@ -54,15 +54,15 @@
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net7.0-android'">
-		<PackageReference Include="CaptureVision " Version="1.0.1" />
+		<PackageReference Include="CaptureVision " Version="2.0.0" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net7.0-ios'">
-
+		<PackageReference Include="CaptureVision " Version="2.0.0" />
 	</ItemGroup>
 
 	<ItemGroup Condition="$([MSBuild]::IsOSPlatform('windows'))">
-		<PackageReference Include="CaptureVision " Version="1.0.1" />
+		<PackageReference Include="CaptureVision " Version="2.0.0" />
 	</ItemGroup>
 
 </Project>

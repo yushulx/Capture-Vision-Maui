@@ -176,11 +176,6 @@ public CameraPage()
 }
 ```
 
-## TODO
-- MRZ detection (iOS)
-- Document detection (iOS)
-
-
 ## References
 - Camera: [https://github.com/hjam40/Camera.MAUI](https://github.com/hjam40/Camera.MAUI)
 - Barcode: [https://github.com/yushulx/dotnet-barcode-qr-code-sdk](https://github.com/yushulx/dotnet-barcode-qr-code-sdk)

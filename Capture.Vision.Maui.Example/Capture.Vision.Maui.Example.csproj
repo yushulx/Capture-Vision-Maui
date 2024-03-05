@@ -30,6 +30,10 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(TargetFramework)'=='net7.0-ios'">
+	  <ProvisioningType>manual</ProvisioningType>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<!-- App Icon -->
 		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
@@ -58,6 +62,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\Capture.Vision.Maui\Capture.Vision.Maui.csproj" />
+		<!--<PackageReference Include="Capture.Vision.Maui" Version="1.4.1" />-->
 	</ItemGroup>
 
 	<ItemGroup>

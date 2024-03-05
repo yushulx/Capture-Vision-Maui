@@ -22,9 +22,11 @@ namespace Capture.Vision.Maui.Platforms.iOS
         private readonly DispatchQueue cameraDispacher;
         private bool initiated = false;
         private BarcodeQRCodeReader barcodeReader;
+        private MrzScanner mrzScanner;
+        private DocumentScanner documentScanner;
         private DispatchQueue queue = new DispatchQueue("ReadTask", true);
         private NSData buffer;
-        private bool ready = true;
+        private volatile bool ready = true;
         public nint width;
         public nint height;
         private nint bpr;
@@ -62,43 +64,143 @@ namespace Capture.Vision.Maui.Platforms.iOS
             {
                 barcodeReader.SetParameters(cameraView.BarcodeParameters);
             }
+
+            mrzScanner = MrzScanner.Create();
+            documentScanner = DocumentScanner.Create();
         }
 
         private void ReadTask()
         {
-            if (barcodeReader != null)
+            try
             {
-                byte[] bytearray = new byte[buffer.Length];
-                System.Runtime.InteropServices.Marshal.Copy(buffer.Bytes, bytearray, 0, Convert.ToInt32(buffer.Length));
-                cameraView.NotifyFrameReady(bytearray, (int)width, (int)height, (int)bpr, FrameReadyEventArgs.PixelFormat.RGBA8888);
-                if (cameraView.EnableBarcode)
+                if (buffer != null)
                 {
-                    results = barcodeReader.DecodeBuffer(bytearray,
-                                            (int)width,
-                                            (int)height,
-                                            (int)bpr,
-                                            BarcodeQRCodeReader.ImagePixelFormat.IPF_ARGB_8888);
-                    BarcodeResult[] barcodeResults = new BarcodeResult[0];
-                    if (results != null && results.Length > 0)
+                    byte[] bytearray = buffer.ToArray();
+                    cameraView.NotifyFrameReady(bytearray, (int)width, (int)height, (int)bpr, FrameReadyEventArgs.PixelFormat.RGBA8888);
+                    if (cameraView.EnableBarcode)
                     {
-                        barcodeResults = new BarcodeResult[results.Length];
-
-                        for (int i = 0; i < results.Length; i++)
+                        results = barcodeReader.DecodeBuffer(bytearray,
+                                                (int)width,
+                                                (int)height,
+                                                (int)bpr,
+                                                BarcodeQRCodeReader.ImagePixelFormat.IPF_ARGB_8888);
+                        BarcodeResult[] barcodeResults = new BarcodeResult[0];
+                        if (results != null && results.Length > 0)
                         {
-                            barcodeResults[i] = new BarcodeResult()
-                            {
-                                Text = results[i].Text,
-                                Points = results[i].Points,
-                                Format1 = results[i].Format1,
-                                Format2 = results[i].Format2
-                            };
-                        }
-                    }
-                    cameraView.NotifyResultReady(barcodeResults, (int)width, (int)height);
-                }   
-            }
+                            barcodeResults = new BarcodeResult[results.Length];
 
-            ready = true;
+                            for (int i = 0; i < results.Length; i++)
+                            {
+                                barcodeResults[i] = new BarcodeResult()
+                                {
+                                    Text = results[i].Text,
+                                    Points = results[i].Points,
+                                    Format1 = results[i].Format1,
+                                    Format2 = results[i].Format2
+                                };
+                            }
+                        }
+                        cameraView.NotifyResultReady(barcodeResults, (int)width, (int)height);
+                    }
+
+                    if (cameraView.EnableDocumentDetect)
+                    {
+                        DocumentScanner.Result[] results = documentScanner.DetectBuffer(bytearray,
+                                                (int)width,
+                                                (int)height,
+                                                (int)bpr,
+                                                DocumentScanner.ImagePixelFormat.IPF_ARGB_8888);
+                        DocumentResult documentResults = new DocumentResult();
+                        if (results != null && results.Length > 0)
+                        {
+                            documentResults = new DocumentResult
+                            {
+                                Confidence = results[0].Confidence,
+                                Points = results[0].Points
+                            };
+
+                            if (cameraView.EnableDocumentRectify)
+                            {
+                                NormalizedImage normalizedImage = documentScanner.NormalizeBuffer(bytearray,
+                                                (int)width,
+                                                (int)height,
+                                                (int)bpr,
+                                                DocumentScanner.ImagePixelFormat.IPF_ARGB_8888, documentResults.Points);
+                                documentResults.Width = normalizedImage.Width;
+                                documentResults.Height = normalizedImage.Height;
+                                documentResults.Stride = normalizedImage.Stride;
+                                documentResults.Format = normalizedImage.Format;
+                                documentResults.Data = normalizedImage.Data;
+                            }
+                        }
+
+                        cameraView.NotifyResultReady(documentResults, (int)width, (int)height);
+
+                    }
+
+                    if (cameraView.EnableMrz)
+                    {
+                        MrzResult mrzResults = new MrzResult();
+                        try
+                        {
+                            MrzScanner.Result[] results = mrzScanner.DetectBuffer(bytearray,
+                                                (int)width,
+                                                (int)height,
+                                                (int)bpr,
+                                                MrzScanner.ImagePixelFormat.IPF_ARGB_8888);
+
+
+                            if (results != null && results.Length > 0)
+                            {
+                                Line[] rawData = new Line[results.Length];
+                                string[] lines = new string[results.Length];
+
+                                for (int i = 0; i < results.Length; i++)
+                                {
+                                    rawData[i] = new Line()
+                                    {
+                                        Confidence = results[i].Confidence,
+                                        Text = results[i].Text,
+                                        Points = results[i].Points,
+                                    };
+                                    lines[i] = results[i].Text;
+                                }
+
+
+                                Dynamsoft.MrzResult info = MrzParser.Parse(lines);
+                                mrzResults = new MrzResult()
+                                {
+                                    RawData = rawData,
+                                    Type = info.Type,
+                                    Nationality = info.Nationality,
+                                    Surname = info.Surname,
+                                    GivenName = info.GivenName,
+                                    PassportNumber = info.PassportNumber,
+                                    IssuingCountry = info.IssuingCountry,
+                                    BirthDate = info.BirthDate,
+                                    Gender = info.Gender,
+                                    Expiration = info.Expiration,
+                                    Lines = info.Lines
+                                };
+
+                            }
+                        }
+
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine(ex.Message);
+                        }
+
+                        cameraView.NotifyResultReady(mrzResults, (int)width, (int)height);
+                    }
+                }
+
+                ready = true;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+            }
         }
 
         private void OrientationChanged(NSNotification notification)
