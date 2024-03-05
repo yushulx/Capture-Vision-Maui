@@ -41,7 +41,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="BarcodeQRCodeSDK" Version="2.3.6" />
-
+		<PackageReference Include="CaptureVision " Version="2.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -53,7 +53,7 @@
 		<None Include="../README.md" Pack="true" PackagePath="" />
 	</ItemGroup>
 
-	<ItemGroup Condition="'$(TargetFramework)' == 'net7.0-android'">
+	<!--<ItemGroup Condition="'$(TargetFramework)' == 'net7.0-android'">
 		<PackageReference Include="CaptureVision " Version="2.0.0" />
 	</ItemGroup>
 
@@ -63,6 +63,6 @@
 
 	<ItemGroup Condition="$([MSBuild]::IsOSPlatform('windows'))">
 		<PackageReference Include="CaptureVision " Version="2.0.0" />
-	</ItemGroup>
+	</ItemGroup>-->
 
 </Project>

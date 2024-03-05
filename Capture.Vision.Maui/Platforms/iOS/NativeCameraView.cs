@@ -7,7 +7,7 @@ using Dynamsoft;
 using Foundation;
 using UIKit;
 using static Capture.Vision.Maui.CameraInfo;
-
+using static Dynamsoft.DocumentScanner;
 namespace Capture.Vision.Maui.Platforms.iOS
 {
 
