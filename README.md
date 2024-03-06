@@ -4,7 +4,13 @@ The project's goal is to assist developers in creating .NET MAUI applications fe
 ## Example
 [https://github.com/yushulx/Capture-Vision-Maui/tree/main/Capture.Vision.Maui.Example](https://github.com/yushulx/Capture-Vision-Maui/tree/main/Capture.Vision.Maui.Example)
 
-![.NET MAUI Windows QR code scanner](https://camo.githubusercontent.com/5b212f793f3ae53c7d2d2ba926f9edafeb3c117b9f63b2ea2ab668cc8938732f/68747470733a2f2f7777772e64796e616d736f66742e636f6d2f636f6465706f6f6c2f696d672f323032342f30312f646f746e65742d6d6175692d626172636f64652d646f63756d656e742d6d727a2e706e67)
+- Windows
+
+    ![.NET MAUI Windows QR code scanner](https://camo.githubusercontent.com/5b212f793f3ae53c7d2d2ba926f9edafeb3c117b9f63b2ea2ab668cc8938732f/68747470733a2f2f7777772e64796e616d736f66742e636f6d2f636f6465706f6f6c2f696d672f323032342f30312f646f746e65742d6d6175692d626172636f64652d646f63756d656e742d6d727a2e706e67)
+
+- iOS
+    
+    ![.NET MAUI iOS: detect barcode, document and mrz](https://www.dynamsoft.com/codepool/img/2024/03/dotnet-maui-ios-barcode-document-mrz.png)
 
 ## Demo Video: .NET MAUI QR Code Scanner
 
@@ -16,6 +22,8 @@ The project's goal is to assist developers in creating .NET MAUI applications fe
 
   [https://github.com/yushulx/Capture-Vision-Maui/assets/2202306/73551440-6720-4912-8605-cee9882bbee2](https://github.com/yushulx/Capture-Vision-Maui/assets/2202306/73551440-6720-4912-8605-cee9882bbee2)
 
+
+
 ## Supported Platforms
 - Android
 - iOS
@@ -23,8 +31,8 @@ The project's goal is to assist developers in creating .NET MAUI applications fe
 
 ## Features
 - Read 1D barcodes, QR codes, PDF417, DataMatrix, and other formats from camera frames.
-- Recognize Machine Readable Zones (MRZ) from camera frames (**Windows & Android**).
-- Detect document edges within camera frames (**Windows & Android**).
+- Recognize Machine Readable Zones (MRZ) from camera frames.
+- Detect document edges within camera frames.
 
 ## Getting Started
 1. Enable the camera view in `MauiProgram.cs`:
@@ -33,9 +41,9 @@ The project's goal is to assist developers in creating .NET MAUI applications fe
     builder.UseNativeCameraView()
     ```
 
-2. Request a [free trial license](https://www.dynamsoft.com/customer/license/trialLicense) and replace `LICENSE-KEY` with your own license key.
+2. Request a [free trial license](https://www.dynamsoft.com/customer/license/trialLicense) and replace `LICENSE-KEY` with your own license key in the platform-specific code.
     
-    **Windows App.xaml.cs**
+    **App.xaml.cs for Windows:**
 
     ```csharp
     using Dynamsoft;
@@ -51,13 +59,11 @@ The project's goal is to assist developers in creating .NET MAUI applications fe
                 DocumentScanner.InitLicense("LICENSE-KEY");
                 MrzScanner.InitLicense("LICENSE-KEY");
             }
-    
-            protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
         }
     }
     ```
 
-    **Android MainActivity.cs**
+    **MainActivity.cs for Android:**
 
     ```csharp
     using Android.App;
@@ -67,7 +73,6 @@ The project's goal is to assist developers in creating .NET MAUI applications fe
     
     namespace Capture.Vision.Maui.Example
     {
-        [Activity(Theme = "@style/Maui.SplashTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density)]
         public class MainActivity : MauiAppCompatActivity
         {
             protected override void OnCreate(Bundle savedInstanceState)
@@ -79,6 +84,23 @@ The project's goal is to assist developers in creating .NET MAUI applications fe
                 MrzScanner.InitLicense("LICENSE-KEY", this);
             }
         }
+    }
+    ```
+
+    **Program.cs for iOS:**
+
+    ```csharp
+    using ObjCRuntime;
+    using UIKit;
+    using Dynamsoft;
+
+    static void Main(string[] args)
+    {
+        DocumentScanner.InitLicense("LICENSE-KEY");
+        BarcodeQRCodeReader.InitLicense("LICENSE-KEY");
+        MrzScanner.InitLicense("LICENSE-KEY");
+    
+        UIApplication.Main(args, null, typeof(AppDelegate));
     }
     ```
 
