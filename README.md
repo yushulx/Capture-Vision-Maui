@@ -10,7 +10,7 @@ The project's goal is to assist developers in creating .NET MAUI applications fe
 
 - iOS
     
-    ![.NET MAUI iOS: detect barcode, document and mrz](https://www.dynamsoft.com/codepool/img/2024/03/dotnet-maui-ios-barcode-document-mrz.png)
+    ![.NET MAUI iOS: detect barcode, document and mrz](https://camo.githubusercontent.com/0a574bc8762d3fb99eef52023f217dcc7c152f0f9a8699370aa3840d8bf3bc8c/68747470733a2f2f7777772e64796e616d736f66742e636f6d2f636f6465706f6f6c2f696d672f323032342f30332f646f746e65742d6d6175692d696f732d626172636f64652d646f63756d656e742d6d727a2e706e67)
 
 ## Demo Video: .NET MAUI QR Code Scanner
 
