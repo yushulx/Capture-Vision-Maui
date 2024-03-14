@@ -81,7 +81,8 @@ The project's goal is to assist developers in creating .NET MAUI applications fe
     
                 // Your platform-specific code here
                 BarcodeQRCodeReader.InitLicense("LICENSE-KEY");
-                MrzScanner.InitLicense("LICENSE-KEY", this);
+                DocumentScanner.InitLicense("LICENSE-KEY");
+                MrzScanner.InitLicense("LICENSE-KEY");
             }
         }
     }
