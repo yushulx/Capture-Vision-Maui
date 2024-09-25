@@ -41,7 +41,7 @@ The project's goal is to assist developers in creating .NET MAUI applications fe
     builder.UseNativeCameraView()
     ```
 
-2. Request a [free trial license](https://www.dynamsoft.com/customer/license/trialLicense) and replace `LICENSE-KEY` with your own license key in the platform-specific code.
+2. Request a [free trial license](https://www.dynamsoft.com/customer/license/trialLicense/?product=dcv&package=cross-platform) and replace `LICENSE-KEY` with your own license key in the platform-specific code.
     
     **App.xaml.cs for Windows:**
 
