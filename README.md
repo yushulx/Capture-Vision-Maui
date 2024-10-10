@@ -6,11 +6,11 @@ This project helps developers create .NET MAUI applications featuring a custom c
 
 - Windows
 
-    ![.NET MAUI Windows QR code scanner](https://www.dynamsoft.com/codepool/img/2023/06/dotnet-maui-windows-qr-code-scanner.png)
+    ![.NET MAUI Windows QR code scanner](https://camo.githubusercontent.com/ae08b9a3805d127862780ccfc20a695c0c9f9c69719c92a285c06c9e10173d37/68747470733a2f2f7777772e64796e616d736f66742e636f6d2f636f6465706f6f6c2f696d672f323032332f30362f646f746e65742d6d6175692d77696e646f77732d71722d636f64652d7363616e6e65722e706e67)
 
 - iOS
     
-    ![.NET MAUI iOS: detect barcode, document and mrz](https://www.dynamsoft.com/codepool/img/2024/03/dotnet-maui-ios-barcode-document-mrz.png)
+    ![.NET MAUI iOS: detect barcode, document and mrz](https://camo.githubusercontent.com/c05b55c16a669c49d18eb2f7e8e0a7f45814ee230e4520a01d897cb275e1d109/68747470733a2f2f7777772e64796e616d736f66742e636f6d2f636f6465706f6f6c2f696d672f323032342f30332f646f746e65742d6d6175692d696f732d626172636f64652d646f63756d656e742d6d727a2e706e67)
 
 ## Demo Video: .NET MAUI QR Code Scanner
 
