@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>2.0.0</Version>
+		<Version>2.0.1</Version>
 		<TargetFrameworks>net7.0;net7.0-android;net7.0-ios</TargetFrameworks>
 		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">
 			$(TargetFrameworks);net7.0-windows10.0.19041.0</TargetFrameworks>
@@ -9,15 +9,20 @@
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
+		<SupportedOSPlatformVersion
+			Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
 			14.2</SupportedOSPlatformVersion>
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">
+		<SupportedOSPlatformVersion
+			Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">
 			14.0</SupportedOSPlatformVersion>
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+		<SupportedOSPlatformVersion
+			Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
 			28.0</SupportedOSPlatformVersion>
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
+		<SupportedOSPlatformVersion
+			Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
 			10.0.17763.0</SupportedOSPlatformVersion>
-		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
+		<TargetPlatformMinVersion
+			Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
 			10.0.17763.0</TargetPlatformMinVersion>
 		<Description>The plugin aims to assist developers in creating .NET MAUI applications
 			featuring a custom camera view. It utilizes Dynamsoft Vision SDKs for barcode, MRZ
@@ -27,7 +32,7 @@
 		<PackageTags>
 			barcode;qrcode;Aztec;QR;Datamatrix;PDF417;Code39;Code93;Code128;Codabar;Interleaved;EAN-8;EAN-13;UPC-A;UPC-E;GS1Databar;PatchCode;Maxicode;COMPOSITE;PostalCode;document;MRZ;passport;ID;visa</PackageTags>
 		<PackageReleaseNotes>
-			- Added document detection and mrz detection for ios
+			- Update the dependencies to the latest version
 		</PackageReleaseNotes>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -35,7 +40,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="BarcodeQRCodeSDK" Version="2.3.7" />
+		<PackageReference Include="BarcodeQRCodeSDK" Version="2.4.0" />
 		<PackageReference Include="CaptureVision " Version="2.0.1" />
 	</ItemGroup>
 
@@ -48,7 +53,8 @@
 		<None Include="../README.md" Pack="true" PackagePath="" />
 	</ItemGroup>
 
-	<!--<ItemGroup Condition="'$(TargetFramework)' == 'net7.0-android'">
+	<!--<ItemGroup
+	Condition="'$(TargetFramework)' == 'net7.0-android'">
 		<PackageReference Include="CaptureVision " Version="2.0.0" />
 	</ItemGroup>
 

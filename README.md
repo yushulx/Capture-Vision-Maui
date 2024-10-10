@@ -1,16 +1,16 @@
 # .NET MAUI Camera View with Dynamsoft Vision SDKs
-The project's goal is to assist developers in creating .NET MAUI applications featuring a custom camera view. It utilizes [Dynamsoft Vision SDKs](https://www.dynamsoft.com/) for barcode, MRZ (Machine Readable Zone), and document detection.
+This project helps developers create .NET MAUI applications featuring a custom camera view using [Dynamsoft Vision SDKs](https://www.dynamsoft.com/). These SDKs provide capabilities for barcode, MRZ (Machine Readable Zone), and document detection.
 
 ## Example
 [https://github.com/yushulx/Capture-Vision-Maui/tree/main/Capture.Vision.Maui.Example](https://github.com/yushulx/Capture-Vision-Maui/tree/main/Capture.Vision.Maui.Example)
 
 - Windows
 
-    ![.NET MAUI Windows QR code scanner](https://camo.githubusercontent.com/5b212f793f3ae53c7d2d2ba926f9edafeb3c117b9f63b2ea2ab668cc8938732f/68747470733a2f2f7777772e64796e616d736f66742e636f6d2f636f6465706f6f6c2f696d672f323032342f30312f646f746e65742d6d6175692d626172636f64652d646f63756d656e742d6d727a2e706e67)
+    ![.NET MAUI Windows QR code scanner](https://www.dynamsoft.com/codepool/img/2023/06/dotnet-maui-windows-qr-code-scanner.png)
 
 - iOS
     
-    ![.NET MAUI iOS: detect barcode, document and mrz](https://camo.githubusercontent.com/0a574bc8762d3fb99eef52023f217dcc7c152f0f9a8699370aa3840d8bf3bc8c/68747470733a2f2f7777772e64796e616d736f66742e636f6d2f636f6465706f6f6c2f696d672f323032342f30332f646f746e65742d6d6175692d696f732d626172636f64652d646f63756d656e742d6d727a2e706e67)
+    ![.NET MAUI iOS: detect barcode, document and mrz](https://www.dynamsoft.com/codepool/img/2024/03/dotnet-maui-ios-barcode-document-mrz.png)
 
 ## Demo Video: .NET MAUI QR Code Scanner
 
@@ -30,9 +30,9 @@ The project's goal is to assist developers in creating .NET MAUI applications fe
 - Windows
 
 ## Features
-- Read 1D barcodes, QR codes, PDF417, DataMatrix, and other formats from camera frames.
+- Scan 1D barcodes, QR codes, PDF417, DataMatrix, and other barcode formats.
 - Recognize Machine Readable Zones (MRZ) from camera frames.
-- Detect document edges within camera frames.
+- Detect document edges in real-time.
 
 ## Getting Started
 1. Enable the camera view in `MauiProgram.cs`:
@@ -145,7 +145,7 @@ The project's goal is to assist developers in creating .NET MAUI applications fe
     ```
 
 ## Custom Image Processing
-In the `cameraView_FrameReady` event, you can access the camera frame for custom image processing. 
+In the `cameraView_FrameReady` event, access the camera frame for custom image processing:
 
 ```csharp
 private void cameraView_FrameReady(object sender, FrameReadyEventArgs e)
@@ -188,7 +188,7 @@ Currently, frames captured from Windows and Android devices are in the `GRAYSCAL
 
 
 ## Barcode Parameters Configuration
-Configure the barcode detection parameters to suit specific scenarios and requirements. This includes adjusting settings for barcode types, scanning precision, and other relevant factors.
+Customize barcode detection parameters to fit specific requirements, such as supported barcode formats and expected counts:
     
 ```csharp
 public CameraPage()
